@@ -1,9 +1,22 @@
+from logging import Logger
 from abc import ABC, abstractmethod
+from .chain import ChainElement
+
+log = Logger(__name__)
 
 
-class CapturingDevice(ABC):
+class CapturingDevice(ChainElement):
     @abstractmethod
-    def get_frame(self):
+    def process(self, *args):
         """
         This method returns the current frame from the capturing device.
         """
+
+
+class ImageGrabDevice(CapturingDevice):
+    """
+    ImageGrab CapturingDevice.
+    """
+
+    def process(self, *args):
+        pass
