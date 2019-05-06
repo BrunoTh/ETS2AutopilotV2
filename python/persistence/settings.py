@@ -8,6 +8,18 @@ BASE_PATH = pathlib.Path(__file__).parent
 
 
 class Settings:
+    INPUT_DEVICE_TYPE = 'controller_type'
+    INPUT_DEVICE_TYPE_KEYBOARD = 0
+    INPUT_DEVICE_TYPE_GAMEPAD = 1
+    INPUT_DEVICE_TYPE_WHEEL = 2
+
+    INPUT_DEVICE_AXIS_STEERING = ''
+    VIRTUAL_CONTROLLER_ID = 'controller_id'  # id of the controller (e.g. vjoy device id)
+    VIEWPORT_ROI_X1 = 'viewport_roi_x1'
+    VIEWPORT_ROI_X2 = 'viewport_roi_x2'
+    VIEWPORT_ROI_Y1 = 'viewport_roi_y1'
+    VIEWPORT_ROI_Y2 = 'viewport_roi_y2'
+
     def __init__(self, filename):
         self.filename = filename
         self._file_object = None
