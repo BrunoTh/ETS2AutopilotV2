@@ -28,6 +28,9 @@ class ProcessingChain(ABC):
         :param chain_element:
         :return:
         """
+        if not isinstance(chain_element, ChainElement):
+            raise TypeError('chain_element needs to be an instance of chain.ChainElement!')
+
         self.chain_elements.append(chain_element)
 
     def run(self):
@@ -44,6 +47,7 @@ class ProcessingChain(ABC):
 class CVChainWindows(ProcessingChain):
     def __init__(self):
         super().__init__()
+
         self.register(capturing.ImageGrabDevice())
         self.register(processing.ColorConversionPreProcessingUnit())
         self.register(processing.ROIPreProcessingUnit())
