@@ -5,8 +5,10 @@ import pathlib
 log = Logger(__name__)
 # Path object of python/ directory.
 BASE_PATH = pathlib.Path(__file__).parent
+DEFAULT_NAME = 'settings.json'
 
 
+# TODO: singleton?
 class Settings:
     INPUT_DEVICE_TYPE = 'controller_type'
     INPUT_DEVICE_TYPE_KEYBOARD = 0
@@ -20,7 +22,7 @@ class Settings:
     VIEWPORT_ROI_Y1 = 'viewport_roi_y1'
     VIEWPORT_ROI_Y2 = 'viewport_roi_y2'
 
-    def __init__(self, filename):
+    def __init__(self, filename=DEFAULT_NAME):
         self.filename = filename
         self._file_object = None
         self._parsed_json = dict()
