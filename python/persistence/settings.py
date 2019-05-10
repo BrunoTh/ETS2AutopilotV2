@@ -47,7 +47,10 @@ class Settings:
             except Exception:
                 log.exception('Error while closing Settings.file_object.')
 
-    def parse_json(self):
+    def parse_json(self, force=False):
+        if self._parsed_json and not force:
+            return
+
         self._parsed_json = json.load(self.get_file_object())
         self.close_file_object()
 
