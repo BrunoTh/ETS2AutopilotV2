@@ -69,7 +69,10 @@ class OptionWidget(HTMLWidget):
 
 
 class SettingsNode:
+    ROOT_NODE_NAME = 'root'
+
     def __init__(self, key='', value='', is_choice=False, widget=None):
+        self.fqid = SettingsNode.ROOT_NODE_NAME  # fully qualified id (e.g. root.controller.device_id)
         self.children = []
         self.possible_choices = []
         self.is_root = False
@@ -79,9 +82,20 @@ class SettingsNode:
         self.key = key
         self.value = value
 
+    def __str__(self):
+        return self.fqid
+
+    def _set_fqid(self, parent_node):
+        self.fqid = f'{parent_node.fqid}.{self.key}'
+
+        for child in self.children:
+            child._set_fqid(self)
+
     def add_child(self, child):
         if not isinstance(child, SettingsNode):
             raise TypeError(f'Object of type {type(child)} is not supported.')
+
+        child._set_fqid(self)
         self.children.append(child)
 
         if self.is_choice:
@@ -91,19 +105,22 @@ class SettingsNode:
         self.children = children.copy()
 
     def set_value_of_child(self, child_path: str, value):
-        self.get_child_in_tree(child_path).value = value
+        self.get_node_in_tree(child_path).value = value
 
     def get_value_of_child(self, child_path: str):
-        return self.get_child_in_tree(child_path).value
+        return self.get_node_in_tree(child_path).value
 
-    def get_child_in_tree(self, child_path: str):
+    def get_node_in_tree(self, child_path: str):
+        if child_path.startswith(f'{SettingsNode.ROOT_NODE_NAME}.'):
+            child_path = child_path.replace(f'{SettingsNode.ROOT_NODE_NAME}.', '')
+
         next_path_elements = child_path.split('.', maxsplit=1)
-        if len(next_path_elements) == 1:
-            return self
-        else:
-            for child in self.children:
-                if child.key == next_path_elements[0]:
-                    return child.get_value_of_child(next_path_elements[1])
+        for child in self.children:
+            if child.key == next_path_elements[0]:
+                if len(next_path_elements) == 1:
+                    return child
+                else:
+                    return child.get_node_in_tree(next_path_elements[1])
 
     def get_sub_tree(self):
         """
@@ -114,6 +131,8 @@ class SettingsNode:
             return self.value
 
         result = dict()
+        result['fqid'] = self.fqid
+
         for child in self.children:
             if child.is_choice:
                 result['value'] = child.key
