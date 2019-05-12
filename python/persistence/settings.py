@@ -34,26 +34,44 @@ root
 
 
 class HTMLWidget(ABC):
-    def __init__(self, settings_node):
-        self.settings_node = settings_node
-
+    @staticmethod
     @abstractmethod
-    def get_html_source(self) -> str:
+    def get_html_source(settings_node) -> str:
         """
         This method returns html code of the widget.
         """
 
 
+class TextWidget(HTMLWidget):
+    @staticmethod
+    def get_html_source(settings_node) -> str:
+        return f'<input type="text" id="id_{settings_node.settings_node.key}" value="{settings_node.settings_node.value}" />'
+
+
 class SelectWidget(HTMLWidget):
-    def get_html_source(self):
-        return f'<input type="text" id="id_{self.settings_node.key}" value="{self.settings_node.value}" />'
+    @staticmethod
+    def get_html_source(settings_node) -> str:
+        html = f'<select id="id_{settings_node.key}">\n'
+
+        for child in settings_node.children:
+            if child.is_choice and child.widget:
+                html += child.render_element()
+                html += '\n'
+
+        html += f'</select>'
+        return html
+
+
+class OptionWidget(HTMLWidget):
+    @staticmethod
+    def get_html_source(settings_node) -> str:
+        return f'<option id="id_{settings_node.key}">{settings_node.key}</option>'
 
 
 class SettingsNode:
-    possible_choices = []
-
     def __init__(self, key='', value='', is_choice=False, widget=None):
         self.children = []
+        self.possible_choices = []
         self.is_root = False
         self.is_choice = is_choice
         self.widget = widget
@@ -65,6 +83,9 @@ class SettingsNode:
         if not isinstance(child, SettingsNode):
             raise TypeError(f'Object of type {type(child)} is not supported.')
         self.children.append(child)
+
+        if self.is_choice:
+            self.possible_choices.append(child)
 
     def choose(self, children):
         self.children = children.copy()
@@ -103,7 +124,7 @@ class SettingsNode:
 
     def render_element(self):
         if self.widget:
-            return self.widget(self).get_html_source()
+            return self.widget().get_html_source(self)
 
 
 # TODO: singleton?
