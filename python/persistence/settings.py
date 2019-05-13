@@ -142,8 +142,10 @@ class SettingsNode:
         return result
 
     def render_element(self):
-        if self.widget:
-            return self.widget().get_html_source(self)
+        if not self.widget:
+            raise ValueError('A widget is required to render this element.')
+
+        return self.widget().get_html_source(self)
 
 
 # TODO: singleton?
