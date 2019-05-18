@@ -1,5 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
+import platform
 from . import capturing
 from . import processing
 from . import controller
@@ -18,9 +19,24 @@ class ChainElement(ABC):
 
 
 class ProcessingChain(ABC):
+    # Use this chain if platform string matches platform.system()
+    platform = 'Linux'
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.chain_elements = []
+
+    @classmethod
+    def get_platform_specific_chain(cls):
+        """
+        Returns the chain for the current platform.
+        :rtype: ProcessingChain
+        """
+        # TODO: Recursive search (multi inheritance)
+        # TODO: Respect settings (user could use another chain for his system)
+        for subclass in cls.__subclasses__():
+            if subclass.platform == platform.system():
+                return subclass
 
     def register(self, chain_element):
         """
@@ -45,6 +61,8 @@ class ProcessingChain(ABC):
 
 
 class CVChainWindows(ProcessingChain):
+    platform = 'Windows'
+
     def __init__(self):
         super().__init__()
 
