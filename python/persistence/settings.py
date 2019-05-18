@@ -39,16 +39,23 @@ class HTMLWidget(ABC):
     def get_html_source(settings_node) -> str:
         """
         This method returns html code of the widget.
+        :type settings_node: SettingsNode
         """
 
 
 class TextWidget(HTMLWidget):
+    """
+    Renders text input.
+    """
     @staticmethod
     def get_html_source(settings_node) -> str:
-        return f'<input type="text" id="id_{settings_node.settings_node.key}" value="{settings_node.settings_node.value}" />'
+        return f'<input type="text" id="id_{settings_node.key}" value="{settings_node.value}" />'
 
 
 class SelectWidget(HTMLWidget):
+    """
+    Renders select tag.
+    """
     @staticmethod
     def get_html_source(settings_node) -> str:
         html = f'<select id="id_{settings_node.key}">\n'
@@ -63,6 +70,9 @@ class SelectWidget(HTMLWidget):
 
 
 class OptionWidget(HTMLWidget):
+    """
+    Renders option tag.
+    """
     @staticmethod
     def get_html_source(settings_node) -> str:
         return f'<option id="id_{settings_node.key}">{settings_node.key}</option>'
@@ -86,12 +96,23 @@ class SettingsNode:
         return self.fqid
 
     def _set_fqid(self, parent_node):
+        """
+        Generates the fqid for every child recursively.
+        :param parent_node:
+        :type parent_node: SettingsNode
+        """
         self.fqid = f'{parent_node.fqid}.{self.key}'
 
         for child in self.children:
             child._set_fqid(self)
 
     def add_child(self, child):
+        """
+
+        :param child: SettingsNode you want to add as child.
+        :type child: SettingsNode
+        :return:
+        """
         if not isinstance(child, SettingsNode):
             raise TypeError(f'Object of type {type(child)} is not supported.')
 
@@ -101,16 +122,32 @@ class SettingsNode:
         if self.is_choice:
             self.possible_choices.append(child)
 
-    def choose(self, children):
-        self.children = children.copy()
+    # def choose(self, children):
+    #     self.children = children.copy()
 
     def set_value_of_child(self, child_path: str, value):
+        """
+        Gets the child behind child_path and sets its value to the given value.
+        :param child_path: Path relative to this parent node.
+        :param value: Value you want to set.
+        """
         self.get_node_in_tree(child_path).value = value
 
     def get_value_of_child(self, child_path: str):
+        """
+        Gets the child behind child_path and returns its value.
+        :param child_path: Path relative to this parent node.
+        :return: Value of child.
+        """
         return self.get_node_in_tree(child_path).value
 
     def get_node_in_tree(self, child_path: str):
+        """
+        Returns the child object behind child_path.
+        :param child_path: Path relative to this parent node.
+        :return: children behind child_path
+        :rtype: SettingsNode
+        """
         if child_path.startswith(f'{SettingsNode.ROOT_NODE_NAME}.'):
             child_path = child_path.replace(f'{SettingsNode.ROOT_NODE_NAME}.', '')
 
@@ -141,7 +178,11 @@ class SettingsNode:
                 result[child.key] = child.get_sub_tree()
         return result
 
-    def render_element(self):
+    def render_element(self) -> str:
+        """
+        If self.widget is set it returns the generated html code for this SettingsNode.
+        :return: HTML Code
+        """
         if not self.widget:
             raise ValueError('A widget is required to render this element.')
 
