@@ -4,7 +4,7 @@ import platform
 from . import capturing
 from . import processing
 from . import controller
-from persistence.settings import Settings
+from .settingstree import Settings
 
 log = Logger(__name__)
 
@@ -47,7 +47,7 @@ class ProcessingChain(ABC):
         :rtype: ProcessingChain
         """
         # TODO: Recursive search (multi inheritance)
-        # TODO: Respect settings (user could use another chain for his system)
+        # TODO: Respect settingstree (user could use another chain for his system)
         for subclass in cls.__subclasses__():
             if subclass.platform == platform.system():
                 return subclass
@@ -87,4 +87,4 @@ class CVChainWindows(ProcessingChain):
         self.register(processing.ColorConversionPreProcessingUnit())
         self.register(processing.ROIPreProcessingUnit())
         self.register(processing.CVLaneDetectionProcessingUnit())
-        self.register(controller.VjoyController(0))  # TODO: get vjoy controller from settings
+        self.register(controller.VjoyController(0))  # TODO: get vjoy controller from settingstree

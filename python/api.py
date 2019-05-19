@@ -1,5 +1,5 @@
 from logging import Logger
-from .persistence.settings import Settings
+from .settingstree import Settings
 import responder
 import json
 

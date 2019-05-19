@@ -1,4 +1,5 @@
-from persistence.settings import SettingsNode, SelectWidget, OptionWidget, TextWidget
+from settingstree import SettingsNode
+from settingstree.widgets import SelectWidget, OptionWidget, TextWidget
 
 
 root = SettingsNode('root')
