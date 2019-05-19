@@ -4,11 +4,24 @@ import platform
 from . import capturing
 from . import processing
 from . import controller
+from persistence.settings import Settings
 
 log = Logger(__name__)
 
 
 class ChainElement(ABC):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._settings = None
+        self._init_settings()
+
+    def collect_settings(self):
+        return self._settings
+
+    def _init_settings(self):
+        pass
+
     @abstractmethod
     def process(self, *args):
         """
@@ -22,9 +35,10 @@ class ProcessingChain(ABC):
     # Use this chain if platform string matches platform.system()
     platform = 'Linux'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, settings: Settings):
+        super().__init__()
         self.chain_elements = []
+        self._settings = settings
 
     @classmethod
     def get_platform_specific_chain(cls):
@@ -48,6 +62,9 @@ class ProcessingChain(ABC):
             raise TypeError('chain_element needs to be an instance of chain.ChainElement!')
 
         self.chain_elements.append(chain_element)
+        # TODO: brainstorming
+        if chain_element.collect_settings():
+            self._settings.root.add_child(chain_element.collect_settings())
 
     def run(self):
         """
@@ -63,8 +80,8 @@ class ProcessingChain(ABC):
 class CVChainWindows(ProcessingChain):
     platform = 'Windows'
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, settings):
+        super().__init__(settings)
 
         self.register(capturing.ImageGrabDevice())
         self.register(processing.ColorConversionPreProcessingUnit())
