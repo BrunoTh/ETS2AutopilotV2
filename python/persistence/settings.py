@@ -227,14 +227,7 @@ class Settings:
     def __init__(self, filename=DEFAULT_NAME):
         self.filename = filename
         self._file_object = None
-        self._parsed_json = dict()
         self.root = SettingsNode()
-
-        try:
-            with open(self.filename) as f:
-                self._parsed_json = json.load(self._file_object)
-        except Exception:
-            log.exception(f'Error while opening {self.filename}.')
 
     def get_file_object(self):
         if not self._file_object:
@@ -250,29 +243,12 @@ class Settings:
             except Exception:
                 log.exception('Error while closing Settings.file_object.')
 
-    def parse_json(self, force=False):
-        if self._parsed_json and not force:
-            return
+    def dump(self):
+        f = self.get_file_object()
+        tree_dict_flat = self.root.get_flat_sub_tree()
+        json.dump(tree_dict_flat, f)
 
-        self._parsed_json = json.load(self.get_file_object())
-        self.close_file_object()
-
-    def dump_json(self):
-        json.dump(self._parsed_json, self.get_file_object())
-        self.close_file_object()
-
-    def get_value(self, key):
-        self.parse_json()
-        # TODO: Pass KeyError or wrap error with own SettingsKeyError Exception?
-        return self._parsed_json[key]
-
-    def write_value(self, key, value):
-        self.parse_json()
-        self._parsed_json[key] = value
-        self.dump_json()
-
-    def delete_key(self, key):
-        self.parse_json()
-        # TODO: Pass KeyError or wrap error with own SettingsKeyError Exception?
-        self._parsed_json.pop(key)
-        self.dump_json()
+    def load(self):
+        f = self.get_file_object()
+        json_dict = json.load(f)
+        self.root.fill_tree_flat(json_dict)
