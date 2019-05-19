@@ -106,6 +106,9 @@ class SettingsNode:
         for child in self.children:
             child._set_fqid(self)
 
+    def has_choices(self):
+        return len(self.possible_choices) > 0
+
     def add_child(self, child):
         """
 
@@ -119,7 +122,7 @@ class SettingsNode:
         child._set_fqid(self)
         self.children.append(child)
 
-        if self.is_choice:
+        if child.is_choice:
             self.possible_choices.append(child)
 
     # def choose(self, children):
@@ -162,7 +165,7 @@ class SettingsNode:
     def get_sub_tree(self):
         """
         This method is used to generate a dict structure of this settings tree.
-        It returns either a dict if this node still has children or just self.value.
+        It returns either a dict if this node still has children. Otherwise just self.value.
         """
         if not self.children:
             return self.value
@@ -171,11 +174,9 @@ class SettingsNode:
         result['fqid'] = self.fqid
 
         for child in self.children:
-            if child.is_choice:
-                result['value'] = child.key
-                result.update(child.get_sub_tree())
-            else:
-                result[child.key] = child.get_sub_tree()
+            if self.has_choices():
+                result['value'] = self.value
+            result[child.key] = child.get_sub_tree()
         return result
 
     def render_element(self) -> str:
