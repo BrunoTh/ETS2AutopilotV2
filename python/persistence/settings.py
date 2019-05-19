@@ -179,6 +179,38 @@ class SettingsNode:
             result[child.key] = child.get_sub_tree()
         return result
 
+    def get_flat_sub_tree(self) -> dict:
+        """
+        This method returns a dict with the child fqids as keys and child values as values. Like a key-value store.
+        :return: key-value store
+        """
+        if not self.children:
+            return {self.fqid: self.value}
+
+        result = dict()
+
+        for child in self.children:
+            if self.has_choices():
+                result.update({
+                    f'{self.fqid}.value': self.value,
+                })
+
+            result.update(**child.get_flat_sub_tree())
+
+        return result
+
+    def fill_tree_flat(self, flat_values: dict):
+        """
+        This method writes previously exported values (with get_flat_sub_tree method) back to the settings tree.
+        :param flat_values: previously exported dict
+        """
+        for fqid, value in flat_values.items():
+            try:
+                self.set_value_of_child(fqid, value)
+            except:
+                # fqid does not exist in tree.
+                pass
+
     def render_element(self) -> str:
         """
         If self.widget is set it returns the generated html code for this SettingsNode.
