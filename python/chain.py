@@ -4,7 +4,7 @@ import platform
 from . import capturing
 from . import processing
 from . import controller
-from .settingstree import Settings
+from .settingstree import Settings, SettingsNode
 
 log = Logger(__name__)
 
@@ -13,14 +13,18 @@ class ChainElement(ABC):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._settings = None
-        self._init_settings()
+        self._settings_node = SettingsNode(key=self.__class__.__name__)
 
-    def collect_settings(self):
-        return self._settings
+    def collect_settings(self) -> SettingsNode:
+        """
+        This methods searches for instances of SettingsNodes and adds them to self._settings_node.
+        :return: self._settings_node
+        """
+        for attribute in dir(self):
+            if isinstance(getattr(self, attribute), SettingsNode):
+                self._settings_node.add_child(getattr(self, attribute))
 
-    def _init_settings(self):
-        pass
+        return self._settings_node
 
     @abstractmethod
     def process(self, *args):
@@ -62,7 +66,8 @@ class ProcessingChain(ABC):
             raise TypeError('chain_element needs to be an instance of chain.ChainElement!')
 
         self.chain_elements.append(chain_element)
-        # TODO: brainstorming
+
+        # Collect element specific settings from chain_element.
         if chain_element.collect_settings():
             self._settings.root.add_child(chain_element.collect_settings())
 
@@ -87,4 +92,4 @@ class CVChainWindows(ProcessingChain):
         self.register(processing.ColorConversionPreProcessingUnit())
         self.register(processing.ROIPreProcessingUnit())
         self.register(processing.CVLaneDetectionProcessingUnit())
-        self.register(controller.VjoyController(0))  # TODO: get vjoy controller from settingstree
+        self.register(controller.VjoyController())
