@@ -2,6 +2,7 @@ from logging import Logger
 from abc import ABC, abstractmethod
 from .chain import ChainElement
 from .api import WebSocketMixin
+from .settingstree import SettingsNode
 
 log = Logger(__name__)
 
@@ -32,6 +33,14 @@ class ColorConversionPreProcessingUnit(PreProcessingUnit):
 
 
 class ROIPreProcessingUnit(PreProcessingUnit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.x1 = SettingsNode(key='x1')
+        self.x2 = SettingsNode(key='x2')
+        self.y1 = SettingsNode(key='y1')
+        self.y2 = SettingsNode(key='y2')
+
     def process(self, frame):
         return frame
 
