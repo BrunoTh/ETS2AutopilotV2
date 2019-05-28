@@ -9,30 +9,6 @@ BASE_PATH = pathlib.Path(__file__).parent
 DEFAULT_NAME = 'settings.json'
 
 
-"""
-Settings structure
-==================
-root
-  input_device = 
-    * keyboard
-      autopilot_button
-    * gamepad
-      device_id
-      autopilot_button
-      steering_axis
-    * wheel
-      device_id
-      autopilot_button
-      steering_axis
-  viewport
-    x1
-    x2
-    y1
-    y2
-  
-"""
-
-
 class SettingsNode:
     ROOT_NODE_NAME = 'root'
 
