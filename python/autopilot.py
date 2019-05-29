@@ -1,7 +1,7 @@
 import platform
-from . import chain
+from chain.builtin import ProcessingChain
+from settingstree import Settings
 
 
 if __name__ == '__main__':
-    if platform.system() == 'Windows':
-        chain.CVChainWindows().run()
+    ProcessingChain.get_platform_specific_chain().run()

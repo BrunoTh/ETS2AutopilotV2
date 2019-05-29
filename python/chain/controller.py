@@ -1,7 +1,7 @@
 from logging import Logger
 from abc import ABC, abstractmethod
-from .chain import ChainElement
-from .settingstree import SettingsNode
+from . import ChainElement
+from settingstree import SettingsNode
 
 log = Logger(__name__)
 

@@ -1,5 +1,5 @@
 from logging import Logger
-from .settingstree import Settings
+from settingstree import Settings
 import responder
 import json
 
