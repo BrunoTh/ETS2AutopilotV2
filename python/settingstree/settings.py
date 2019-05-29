@@ -162,7 +162,7 @@ class Settings:
 
     def get_file_object(self):
         if not self._file_object:
-            self._file_object = open(self.filename, 'r')
+            self._file_object = open(self.filename, 'a')
 
         return self._file_object
 
@@ -174,9 +174,12 @@ class Settings:
             except Exception:
                 log.exception('Error while closing Settings.file_object.')
 
+    def dumps(self):
+        return self.root.get_flat_sub_tree()
+
     def dump(self):
         f = self.get_file_object()
-        tree_dict_flat = self.root.get_flat_sub_tree()
+        tree_dict_flat = self.dumps()
         json.dump(tree_dict_flat, f)
 
     def load(self):
