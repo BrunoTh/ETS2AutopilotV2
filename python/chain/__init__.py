@@ -61,8 +61,9 @@ class ProcessingChain(ABC):
         self.chain_elements.append(chain_element)
 
         # Collect element specific settings from chain_element.
-        if chain_element.collect_settings():
-            self._settings.root.add_child(chain_element.collect_settings())
+        chain_element_settings_subtree = chain_element.collect_settings()
+        if chain_element_settings_subtree.has_children():
+            self._settings.root.add_child(chain_element_settings_subtree)
 
     def run(self):
         """

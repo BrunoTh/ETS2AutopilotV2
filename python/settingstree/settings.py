@@ -40,6 +40,9 @@ class SettingsNode:
     def has_choices(self):
         return len(self.possible_choices) > 0
 
+    def has_children(self):
+        return len(self.children) > 0
+
     def add_child(self, child):
         """
 
