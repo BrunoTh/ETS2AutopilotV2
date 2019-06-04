@@ -165,7 +165,9 @@ class Settings:
 
     def get_file_object(self):
         if not self._file_object:
-            self._file_object = open(self.filename, 'a')
+            self._file_object = open(self.filename, 'rw')
+
+        self._file_object.seek(0)
 
         return self._file_object
 
