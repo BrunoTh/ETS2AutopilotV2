@@ -1,6 +1,7 @@
 from logging import Logger
 import json
 import pathlib
+from .widgets import SubtreeWidget
 
 
 log = Logger(__name__)
@@ -162,7 +163,7 @@ class Settings:
     def __init__(self, filename=DEFAULT_NAME):
         self.filename = filename
         self._file_object = None
-        self.root = SettingsNode()
+        self.root = SettingsNode(widget=SubtreeWidget, verbose_name='Settings')
 
     def get_file_object(self):
         if not self._file_object:
