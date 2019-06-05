@@ -44,3 +44,23 @@ class OptionWidget(HTMLWidget):
     @staticmethod
     def get_html_source(settings_node) -> str:
         return f'<option id="id_{settings_node.key}">{settings_node.key}</option>'
+
+
+class SubtreeWidget(HTMLWidget):
+    """
+    Renders child elements in div.
+    """
+    @staticmethod
+    def get_html_source(settings_node) -> str:
+        html_code = f'<div id="{settings_node.key}">\n'
+        html_code += f'<h2>{settings_node.verbose_name if settings_node.verbose_name else settings_node.key}</h2>\n'
+
+        for child in settings_node.children:
+            try:
+                html_code += child.render_element()
+            except Exception as e:
+                pass
+
+        html_code += '</div>\n'
+
+        return html_code
