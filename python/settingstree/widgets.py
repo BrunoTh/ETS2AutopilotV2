@@ -58,6 +58,7 @@ class SubtreeWidget(HTMLWidget):
         for child in settings_node.children:
             try:
                 html_code += child.render_element()
+                html_code += '\n'
             except Exception as e:
                 pass
 
