@@ -4,6 +4,8 @@ from settingstree import Settings, SettingsNode
 
 
 class ChainElement(ABC):
+    VERBOSE_NAME = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -12,7 +14,7 @@ class ChainElement(ABC):
         This methods searches for instances of SettingsNodes and adds them to self._settings_node.
         :return: self._settings_node
         """
-        settings_node = SettingsNode(key=self.__class__.__name__)
+        settings_node = SettingsNode(key=self.__class__.__name__, verbose_name=self.__class__.VERBOSE_NAME)
         for attribute in dir(self):
             if attribute != '_settings_node' and isinstance(getattr(self, attribute), SettingsNode):
                 settings_node.add_child(getattr(self, attribute))

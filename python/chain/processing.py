@@ -33,6 +33,8 @@ class ColorConversionPreProcessingUnit(PreProcessingUnit):
 
 
 class ROIPreProcessingUnit(PreProcessingUnit):
+    VERBOSE_NAME = 'Viewport'
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

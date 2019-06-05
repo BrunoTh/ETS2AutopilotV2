@@ -12,13 +12,14 @@ DEFAULT_NAME = 'settings.json'
 class SettingsNode:
     ROOT_NODE_NAME = 'root'
 
-    def __init__(self, key='', value='', is_choice=False, widget=None):
+    def __init__(self, key='', value='', is_choice=False, widget=None, verbose_name=None):
         self.fqid = SettingsNode.ROOT_NODE_NAME  # fully qualified id (e.g. root.controller.device_id)
         self.children = []
         self.possible_choices = []
         self.is_root = False
         self.is_choice = is_choice
         self.widget = widget
+        self.verbose_name = verbose_name
 
         self.key = key
         self.value = value
