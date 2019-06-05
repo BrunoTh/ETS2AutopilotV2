@@ -1,6 +1,7 @@
 import platform
 from abc import ABC, abstractmethod
 from settingstree import Settings, SettingsNode
+from settingstree.widgets import SubtreeWidget
 
 
 class ChainElement(ABC):
@@ -14,7 +15,8 @@ class ChainElement(ABC):
         This methods searches for instances of SettingsNodes and adds them to self._settings_node.
         :return: self._settings_node
         """
-        settings_node = SettingsNode(key=self.__class__.__name__, verbose_name=self.__class__.VERBOSE_NAME)
+        settings_node = SettingsNode(key=self.__class__.__name__, verbose_name=self.__class__.VERBOSE_NAME,
+                                     widget=SubtreeWidget)
         for attribute in dir(self):
             if attribute != '_settings_node' and isinstance(getattr(self, attribute), SettingsNode):
                 settings_node.add_child(getattr(self, attribute))

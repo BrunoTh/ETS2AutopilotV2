@@ -2,7 +2,7 @@ from logging import Logger
 from abc import ABC, abstractmethod
 from . import ChainElement
 from api import WebSocketMixin
-from settingstree import SettingsNode
+from settingstree import SettingsNode, TextWidget
 
 log = Logger(__name__)
 
@@ -38,10 +38,10 @@ class ROIPreProcessingUnit(PreProcessingUnit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.x1 = SettingsNode(key='x1')
-        self.x2 = SettingsNode(key='x2')
-        self.y1 = SettingsNode(key='y1')
-        self.y2 = SettingsNode(key='y2')
+        self.x1 = SettingsNode(key='x1', widget=TextWidget)
+        self.x2 = SettingsNode(key='x2', widget=TextWidget)
+        self.y1 = SettingsNode(key='y1', widget=TextWidget)
+        self.y2 = SettingsNode(key='y2', widget=TextWidget)
 
     def process(self, frame):
         return frame
