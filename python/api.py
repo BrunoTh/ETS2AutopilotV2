@@ -22,7 +22,8 @@ class WebSocketMixin:
 @responder_api.on_event('startup')
 async def initialize_chain():
     global processing_chain
-    processing_chain = ProcessingChain.get_platform_specific_chain()
+    platform_chain = ProcessingChain.get_platform_specific_chain()
+    processing_chain = platform_chain(settings)
 
     if not processing_chain:
         log.error('Your platform is currently not supported.')
@@ -35,9 +36,8 @@ async def page_index(request, response):
 
 @responder_api.route('/settings')
 async def page_settings(request, response):
-    sub_tree = settings.root.get_sub_tree()
-    # TODO: What's a good way to render the form structure?
-    response.html = responder_api.template('settings.html', form_html=sub_tree)
+    settings_form = settings.root.render_element()
+    response.html = responder_api.template('settings.html', form_html=settings_form)
 
 
 @responder_api.route('/ws/index', websocket=True)
