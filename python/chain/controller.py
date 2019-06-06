@@ -1,6 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
-from . import ChainElement
+from .builtin import ChainElement
 from settingstree import SettingsNode
 
 log = Logger(__name__)

@@ -1,7 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
-from . import ChainElement
-from api import WebSocketMixin
+from .builtin import ChainElement
 from settingstree import SettingsNode, TextWidget
 
 log = Logger(__name__)
@@ -47,9 +46,8 @@ class ROIPreProcessingUnit(PreProcessingUnit):
         return frame
 
 
-class CVLaneDetectionProcessingUnit(ProcessingUnit, WebSocketMixin):
+class CVLaneDetectionProcessingUnit(ProcessingUnit):
     def process(self, frame):
         angle = 0
         # TODO: Also send image with drawn lanes to webapp.
-        self.send_via_websocket(angle)
         return angle

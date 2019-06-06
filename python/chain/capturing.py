@@ -1,6 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
-from . import ChainElement
+from .builtin import ChainElement
 
 log = Logger(__name__)
 
