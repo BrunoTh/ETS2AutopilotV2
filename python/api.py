@@ -30,14 +30,14 @@ async def initialize_chain():
 
 @responder_api.route('/')
 async def page_index(request, response):
-    return responder_api.template('index.html')
+    response.html = responder_api.template('index.html')
 
 
 @responder_api.route('/settings')
 async def page_settings(request, response):
     sub_tree = settings.root.get_sub_tree()
     # TODO: What's a good way to render the form structure?
-    return responder_api.template('settings.html', form_html=sub_tree)
+    response.html = responder_api.template('settings.html', form_html=sub_tree)
 
 
 @responder_api.route('/ws/index', websocket=True)
