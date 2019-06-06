@@ -1,13 +1,15 @@
 from logging import Logger
 from settingstree import Settings
 import responder
-import json
 from chain import ProcessingChain
 
 log = Logger(__name__)
 settings = Settings()
 responder_api = responder.API()
 processing_chain = None
+
+# APP STATES
+ap_active = False
 
 
 class WebSocketMixin:
@@ -45,11 +47,25 @@ async def index_route(ws):
     :param ws:
     :return:
     """
+
+    @responder_api.background.task
+    async def run_autopilot_loop():
+        while ap_active:
+            processing_chain.run()
+
     await ws.accept()
 
     while True:
         received_json = await ws.receive_json()
         cmd = received_json['cmd']
+
+        # TODO: figure out better way. Maybe use an interface where you can register the commands.
+        if cmd == 'activate':
+            ap_active = True
+            # TODO: Does this actually work?
+            await run_autopilot_loop()
+        elif cmd == 'deactivate':
+            ap_active = False
 
 
 @responder_api.route('/ws/ap_image', websocket=True)
