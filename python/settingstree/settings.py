@@ -28,6 +28,13 @@ class SettingsNode:
     def __str__(self):
         return self.fqid
 
+    @property
+    def label(self):
+        """
+        Returns either verbose_name if set or key.
+        """
+        return self.verbose_name if self.verbose_name else self.key
+
     def _set_fqid(self, parent_node):
         """
         Generates the fqid for every child recursively.

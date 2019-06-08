@@ -22,11 +22,12 @@ class HTMLWidget(ABC):
 
 class TextWidget(HTMLWidget):
     """
-    Renders text input.
+    Renders text input with label.
     """
     @classmethod
     def get_html_source(cls, settings_node) -> str:
-        return f'<input type="text" id="id_{cls.get_html_id(settings_node)}" value="{settings_node.value}" />'
+        return f'<input type="text" id="id_{cls.get_html_id(settings_node)}" value="{settings_node.value}" />\n' \
+            f'<label for="id_{cls.get_html_id(settings_node)}">{settings_node.label}</label>'
 
 
 class SelectWidget(HTMLWidget):
@@ -66,8 +67,11 @@ class SubtreeWidget(HTMLWidget):
 
         for child in settings_node.children:
             try:
+                # TODO: Add materialize specific stuff somewhere else. Maybe use a SubtreeMaterializeWidget.
+                html_code += '<div class="input_field col">\n'
                 html_code += child.render_element()
                 html_code += '\n'
+                html_code += '</div>\n'
             except Exception as e:
                 pass
 
