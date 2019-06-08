@@ -62,6 +62,7 @@ class SubtreeWidget(HTMLWidget):
     """
     @classmethod
     def get_html_source(cls, settings_node) -> str:
+        # TODO: Don't render the subtree if no child has a widget attached.
         html_code = f'<div id="div_{cls.get_html_id(settings_node)}">\n'
         html_code += f'<h2>{settings_node.verbose_name if settings_node.verbose_name else settings_node.key}</h2>\n'
 
