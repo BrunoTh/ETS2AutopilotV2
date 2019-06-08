@@ -1,5 +1,9 @@
 {% extends '_base.html' %}
 
-<form>
-    {{ form_html }}
-</form>
+{% block content %}
+    <div class="row">
+        <form>
+            {{ form_html|safe }}
+        </form>
+    </div>
+{% endblock content %}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ETS2Autopilot V2</title>
+
+        <link type="text/css" rel="stylesheet" href="/static/css/materialize.min.css"  media="screen,projection"/>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <nav>
+            <div class="nav-wrapper">
+                <ul id="nav-top" class="right">
+                    <li><a href="/">Autopilot</a></li>
+                    <li><a href="/settings">Settings</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+
+        <script type="text/javascript" src="/static/js/materialize.min.js"></script>
+    </body>
+</html>
