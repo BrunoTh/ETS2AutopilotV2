@@ -16,6 +16,7 @@
             var received_json = JSON.parse(e.data);
 
             if (received_json.status == 200) {
+                // TODO: element id comes from Widget.get_html_id. May pass prefix via template.
                 var input_field = document.getElementById('id_' + received_json.fqid);
                 input_field.value = received_json.value;
             }
