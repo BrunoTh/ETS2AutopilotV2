@@ -34,7 +34,7 @@ class SelectWidget(HTMLWidget):
     """
     Renders select tag.
     """
-    @staticmethod
+    @classmethod
     def get_html_source(cls, settings_node) -> str:
         html = f'<select id="id_{cls.get_html_id(settings_node)}">\n'
 
