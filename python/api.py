@@ -2,6 +2,7 @@ from logging import Logger
 from settingstree import Settings
 import responder
 from chain import ProcessingChain
+from json.decoder import JSONDecodeError
 
 log = Logger(__name__)
 settings = Settings()
@@ -76,39 +77,43 @@ async def apimage_route(ws):
 @responder_api.route('/ws/settings', websocket=True)
 async def settings_route(ws):
     """
-    Websocket for settings. Takes json with elements: cmd, fqid, value
+    Websocket for settings. Takes json with elements: cmd, fqid, value.
+    Sends json with status, fqid, value.
     :param ws: websocket
     """
-
-    # WARNING!
-    # I'm just goofing around. I'm not sure if this is a good way. If a way at all.
-    # Another idea is to use an adapter class that executes a method which is registered to a command.
-    # TODO: Needs some more brainstorming. Maybe a brain-tornado.
 
     await ws.accept()
 
     while True:
-        received_json = await ws.receive_json()
+        # Try to receive json and catch exception if data is not valid json.
+        try:
+            received_json = await ws.receive_json()
+        except JSONDecodeError:
+            log.exception('Received message is not valid json!')
+            continue
+
         cmd = received_json['cmd']
         fqid = received_json['fqid']
         value = received_json.get('value')
 
-        response = {'status': 500, 'response': ''}
+        response = {'status': 500, 'fqid': fqid, 'value': ''}
 
         try:
+            # Send back the value of fqid.
             if cmd == 'get':
                 response['status'] = 200
-                response['response'] = settings.root.get_value_of_child(fqid)
+                response['value'] = settings.root.get_value_of_child(fqid)
+            # Set value of fqid and send it back.
             elif cmd == 'set':
                 if not value:
                     raise AttributeError('Value is not set.')
 
                 settings.root.set_value_of_child(fqid, value)
                 response['status'] = 200
-                response['response'] = settings.root.get_value_of_child(fqid)
+                response['value'] = settings.root.get_value_of_child(fqid)
         except Exception as e:
             log.exception('Error in settings websocket.')
             response['status'] = 500
-            response['response'] = str(e)
+            response['value'] = str(e)
 
         await ws.send_json(response)

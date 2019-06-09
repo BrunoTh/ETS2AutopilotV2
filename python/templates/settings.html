@@ -6,4 +6,19 @@
             {{ form_html|safe }}
         </form>
     </div>
+
+    <script>
+        var connection = new WebSocket('ws://' + window.location.host + '/ws/settings');
+
+        connection.onmessage = function(e) {
+            console.log(e.data);
+
+            var received_json = JSON.parse(e.data);
+
+            if (received_json.status == 200) {
+                var input_field = document.getElementById('id_' + received_json.fqid);
+                input_field.value = received_json.value;
+            }
+        };
+    </script>
 {% endblock content %}
