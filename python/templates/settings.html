@@ -21,5 +21,30 @@
                 input_field.value = received_json.value;
             }
         };
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            // TODO: add showSaveCancelButtons as onfocus Event to input (select, textarea) fields.
+        });
+
+        function showSaveCancelButtons(parent) {
+            // onfocus
+            // TODO: mind other element types like select or textarea. Use css class as filter instead?
+            let element = parent.getElementsByTagName('input')[0];
+            element.parentElement.innerHTML = '<a onclick="saveOnClick(this.parentElement)">Save</a>' +
+                '<a onclick="cancelOnClick(this.parentElement)">Cancel</a>' +
+                element.parentElement.innerHTML;
+        }
+
+        function hideSaveCancelButtons(element) {
+
+        }
+
+        function saveOnClick(element) {
+
+        }
+
+        function cancelOnClick(element) {
+
+        }
     </script>
 {% endblock content %}
