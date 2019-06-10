@@ -11,7 +11,7 @@
         var connection = new WebSocket('ws://' + window.location.host + '/ws/settings');
 
         connection.onmessage = function(e) {
-            console.log(e.data);
+            console.log('Received: ' + e.data);
 
             var received_json = JSON.parse(e.data);
 
@@ -22,29 +22,68 @@
             }
         };
 
-        document.addEventListener("DOMContentLoaded", function (event) {
+        function setValueWithFqid(fqid, value) {
+            connection.send('{"cmd": "set", "fqid": "' + fqid + '", "value": "' + value + '"}');
+        }
+
+        // Add onfocus event listener to input fields.
+        document.addEventListener("DOMContentLoaded", function(event) {
             // TODO: add showSaveCancelButtons as onfocus Event to input (select, textarea) fields.
+            let input_elements = document.getElementsByTagName('input');
+
+            for (let i=0; i<input_elements.length; i++) {
+                // onfocus event
+                input_elements[i].addEventListener('focus', function(event) {
+                    showSaveCancelButtons(event.target.parentElement);
+                });
+            }
         });
 
         function showSaveCancelButtons(parent) {
-            // onfocus
-            // TODO: mind other element types like select or textarea. Use css class as filter instead?
+            // Generate cancel link
+            let cancel_link = document.createElement('a');
+            cancel_link.setAttribute('name', 'cancel');
+            cancel_link.appendChild(document.createTextNode('Cancel'));
+            cancel_link.addEventListener('click', function(event) {
+                cancelOnClick(parent);
+            });
+            parent.appendChild(cancel_link);
+
+            // Generate save link
+            let save_link = document.createElement('a');
+            save_link.setAttribute('name', 'save');
+            save_link.appendChild(document.createTextNode('Save'));
+            save_link.addEventListener('click', function(event) {
+                saveOnClick(parent);
+            });
+            parent.appendChild(save_link);
+        }
+
+        function hideSaveCancelButtons(parent) {
+            // Remove all links (a tags) from parent.
+            let link_elements = parent.getElementsByTagName('a');
+
+            for (let i=link_elements.length-1; i>=0; i--) {
+                parent.removeChild(link_elements[i]);
+            }
+        }
+
+        function saveOnClick(parent) {
+            // Get the input element.
             let element = parent.getElementsByTagName('input')[0];
-            element.parentElement.innerHTML = '<a onclick="saveOnClick(this.parentElement)">Save</a>' +
-                '<a onclick="cancelOnClick(this.parentElement)">Cancel</a>' +
-                element.parentElement.innerHTML;
+
+            // Read fqid and value.
+            let fqid = element.getAttribute('id').replace('id_', '');
+            let value = element.value;
+
+            // Send fqid and value via websocket and remove buttons.
+            setValueWithFqid(fqid, value);
+            hideSaveCancelButtons(parent);
         }
 
-        function hideSaveCancelButtons(element) {
-
-        }
-
-        function saveOnClick(element) {
-
-        }
-
-        function cancelOnClick(element) {
-
+        function cancelOnClick(parent) {
+            // Hide the buttons.
+            hideSaveCancelButtons(parent);
         }
     </script>
 {% endblock content %}
