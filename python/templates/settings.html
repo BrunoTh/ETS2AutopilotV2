@@ -40,28 +40,37 @@
         });
 
         function showSaveCancelButtons(parent) {
+            hideSaveCancelButtons(parent);
+
+            let surrounding_div = document.createElement('div');
+            surrounding_div.classList.add('prefix');
+
             // Generate cancel link
-            let cancel_link = document.createElement('a');
+            let cancel_link = document.createElement('i');
+            cancel_link.classList.add('material-icons');
+            cancel_link.appendChild(document.createTextNode('cancel'));
             cancel_link.setAttribute('name', 'cancel');
-            cancel_link.appendChild(document.createTextNode('Cancel'));
             cancel_link.addEventListener('click', function(event) {
                 cancelOnClick(parent);
             });
-            parent.appendChild(cancel_link);
+            surrounding_div.appendChild(cancel_link);
 
             // Generate save link
-            let save_link = document.createElement('a');
+            let save_link = document.createElement('i');
+            save_link.classList.add('material-icons');
+            save_link.appendChild(document.createTextNode('check'));
             save_link.setAttribute('name', 'save');
-            save_link.appendChild(document.createTextNode('Save'));
             save_link.addEventListener('click', function(event) {
                 saveOnClick(parent);
             });
-            parent.appendChild(save_link);
+            surrounding_div.appendChild(save_link);
+
+            parent.appendChild(surrounding_div);
         }
 
         function hideSaveCancelButtons(parent) {
             // Remove all links (a tags) from parent.
-            let link_elements = parent.getElementsByTagName('a');
+            let link_elements = parent.getElementsByTagName('i');
 
             for (let i=link_elements.length-1; i>=0; i--) {
                 parent.removeChild(link_elements[i]);
