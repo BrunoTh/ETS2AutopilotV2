@@ -63,13 +63,14 @@ class SubtreeWidget(HTMLWidget):
     @classmethod
     def get_html_source(cls, settings_node) -> str:
         # TODO: Don't render the subtree if no child has a widget attached.
-        html_code = f'<div id="div_{cls.get_html_id(settings_node)}">\n'
+        html_code = f'<div id="div_{cls.get_html_id(settings_node)}" class="row">\n'
         html_code += f'<h2>{settings_node.verbose_name if settings_node.verbose_name else settings_node.key}</h2>\n'
 
         for child in settings_node.children:
             try:
                 # TODO: Add materialize specific stuff somewhere else. Maybe use a SubtreeMaterializeWidget.
-                html_code += '<div class="input_field col">\n'
+                # TODO: Add div in child-widget. Maybe nested widgets like DivWidget(TextWidget)?
+                html_code += '<div class="input-field col">\n'
                 html_code += child.render_element()
                 html_code += '\n'
                 html_code += '</div>\n'
