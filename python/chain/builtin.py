@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from settingstree import SettingsNode
 from settingstree.widgets import SubtreeWidget
+from collections import namedtuple
+
+ProcessingResult = namedtuple('ProcessingResult', ('args', 'kwargs'), defaults=([], {}))
 
 
 class ChainElement(ABC):
@@ -23,7 +26,7 @@ class ChainElement(ABC):
         return settings_node
 
     @abstractmethod
-    def process(self, *args):
+    def process(self, *args, **kwargs) -> ProcessingResult:
         """
 
         :param args:

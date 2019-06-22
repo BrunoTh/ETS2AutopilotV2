@@ -1,6 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
-from .builtin import ChainElement
+from .builtin import ChainElement, ProcessingResult
 
 log = Logger(__name__)
 
@@ -18,5 +18,5 @@ class ImageGrabDevice(CapturingDevice):
     ImageGrab CapturingDevice.
     """
 
-    def process(self, *args):
-        pass
+    def process(self, *args, **kwargs):
+        return ProcessingResult()

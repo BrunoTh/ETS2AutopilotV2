@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from settingstree import Settings, SettingsNode
 from settingstree.widgets import SubtreeWidget
 from . import capturing, processing, controller
-from .builtin import ChainElement
+from .builtin import ChainElement, ProcessingResult
 
 
 class ProcessingChain(ABC):
@@ -48,14 +48,14 @@ class ProcessingChain(ABC):
         This method iterates through all registered chain_elements. It calls the process method and passes the output
         to the next chain element.
         """
-        mid_result = ()
+        mid_result = ProcessingResult([], {})
 
         for element in self.chain_elements:
-            mid_result = element.process(*mid_result)
+            mid_result = element.process(*mid_result.args, **mid_result.kwargs)
 
 
 class CVChainWindows(ProcessingChain):
-    platform = 'Windows'
+    platform = 'Linux'
 
     def __init__(self, settings):
         super().__init__(settings)

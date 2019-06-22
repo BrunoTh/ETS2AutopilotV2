@@ -1,6 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
-from .builtin import ChainElement
+from .builtin import ChainElement, ProcessingResult
 from settingstree import SettingsNode, TextWidget
 
 log = Logger(__name__)
@@ -28,7 +28,7 @@ class ProcessingUnit(ChainElement):
 
 class ColorConversionPreProcessingUnit(PreProcessingUnit):
     def process(self, frame):
-        return frame
+        return ProcessingResult()
 
 
 class ROIPreProcessingUnit(PreProcessingUnit):
@@ -43,11 +43,11 @@ class ROIPreProcessingUnit(PreProcessingUnit):
         self.y2 = SettingsNode(key='y2', widget=TextWidget)
 
     def process(self, frame):
-        return frame
+        return ProcessingResult()
 
 
 class CVLaneDetectionProcessingUnit(ProcessingUnit):
     def process(self, frame):
         angle = 0
         # TODO: Also send image with drawn lanes to webapp.
-        return angle
+        return ProcessingResult()
