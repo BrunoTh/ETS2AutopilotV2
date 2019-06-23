@@ -7,7 +7,7 @@ log = Logger(__name__)
 
 class CapturingDevice(ChainElement):
     @abstractmethod
-    def process(self, *args):
+    def process(self, *args, **kwargs):
         """
         This method returns the current frame from the capturing device.
         """
@@ -16,7 +16,17 @@ class CapturingDevice(ChainElement):
 class ImageGrabDevice(CapturingDevice):
     """
     ImageGrab CapturingDevice.
+    Usable on Windows.
     """
 
+    def process(self, *args, **kwargs):
+        return ProcessingResult()
+
+
+class PyscreenshotDevice(CapturingDevice):
+    """
+    Pyscreenshot CapturingDevice.
+    Usable on Linux.
+    """
     def process(self, *args, **kwargs):
         return ProcessingResult()

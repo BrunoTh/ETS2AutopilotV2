@@ -8,7 +8,7 @@ log = Logger(__name__)
 
 class ControllerInstance(ChainElement):
     @abstractmethod
-    def process(self, angle):
+    def process(self, angle, *args, **kwargs):
         """
         This method takes a steering angle and passes it to a controller device.
         :param angle: Steering angle

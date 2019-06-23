@@ -8,7 +8,7 @@ log = Logger(__name__)
 
 class PreProcessingUnit(ChainElement):
     @abstractmethod
-    def process(self, frame):
+    def process(self, frame, *args, **kwargs):
         """
         This method is doing something with your frame (e.g. resizing) and returns the new frame.
         :param frame: A frame you want to pre-process.
@@ -18,7 +18,7 @@ class PreProcessingUnit(ChainElement):
 
 class ProcessingUnit(ChainElement):
     @abstractmethod
-    def process(self, frame):
+    def process(self, frame, *args, **kwargs):
         """
         This method takes a frame and figures out the steering angle.
         :param frame: A frame you want to process.
@@ -27,7 +27,7 @@ class ProcessingUnit(ChainElement):
 
 
 class ColorConversionPreProcessingUnit(PreProcessingUnit):
-    def process(self, frame):
+    def process(self, frame, *args, **kwargs):
         return ProcessingResult()
 
 
@@ -42,12 +42,12 @@ class ROIPreProcessingUnit(PreProcessingUnit):
         self.y1 = SettingsNode(key='y1', widget=TextWidget)
         self.y2 = SettingsNode(key='y2', widget=TextWidget)
 
-    def process(self, frame):
+    def process(self, frame, *args, **kwargs):
         return ProcessingResult()
 
 
 class CVLaneDetectionProcessingUnit(ProcessingUnit):
-    def process(self, frame):
+    def process(self, frame, *args, **kwargs):
         angle = 0
         # TODO: Also send image with drawn lanes to webapp.
         return ProcessingResult()
