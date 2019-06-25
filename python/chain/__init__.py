@@ -55,7 +55,7 @@ class ProcessingChain(ABC):
 
 
 class CVChainWindows(ProcessingChain):
-    platform = 'Linux'
+    platform = 'Windows'
 
     def __init__(self, settings):
         super().__init__(settings)
@@ -65,3 +65,16 @@ class CVChainWindows(ProcessingChain):
         self.register(processing.ROIPreProcessingUnit())
         self.register(processing.CVLaneDetectionProcessingUnit())
         self.register(controller.VjoyController())
+
+
+class CVChainLinux(ProcessingChain):
+    platform = 'Linux'
+
+    def __init__(self, settings):
+        super().__init__(settings)
+
+        self.register(capturing.PyscreenshotDevice())
+        self.register(processing.ColorConversionPreProcessingUnit())
+        self.register(processing.ROIPreProcessingUnit())
+        self.register(processing.CVLaneDetectionProcessingUnit())
+        # self.register()
