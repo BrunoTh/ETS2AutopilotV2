@@ -10,6 +10,7 @@ responder = "*"
 opencv-python = "*"
 pillow = "*"
 pyscreenshot = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"
