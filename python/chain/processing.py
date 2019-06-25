@@ -2,6 +2,8 @@ from logging import Logger
 from abc import ABC, abstractmethod
 from .builtin import ChainElement, ProcessingResult
 from settingstree import SettingsNode, TextWidget
+import numpy as np
+import cv2
 
 log = Logger(__name__)
 
@@ -28,7 +30,8 @@ class ProcessingUnit(ChainElement):
 
 class ColorConversionPreProcessingUnit(PreProcessingUnit):
     def process(self, frame, *args, **kwargs):
-        return ProcessingResult()
+        frame_converted = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        return ProcessingResult(args=(frame_converted,))
 
 
 class ROIPreProcessingUnit(PreProcessingUnit):
@@ -37,13 +40,14 @@ class ROIPreProcessingUnit(PreProcessingUnit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.x1 = SettingsNode(key='x1', widget=TextWidget)
-        self.x2 = SettingsNode(key='x2', widget=TextWidget)
-        self.y1 = SettingsNode(key='y1', widget=TextWidget)
-        self.y2 = SettingsNode(key='y2', widget=TextWidget)
+        self.x1 = SettingsNode(key='x1', widget=TextWidget, verbose_name='Left')
+        self.x2 = SettingsNode(key='x2', widget=TextWidget, verbose_name='Right')
+        self.y1 = SettingsNode(key='y1', widget=TextWidget, verbose_name='Top')
+        self.y2 = SettingsNode(key='y2', widget=TextWidget, verbose_name='Bottom')
 
     def process(self, frame, *args, **kwargs):
-        return ProcessingResult()
+        roi_frame = frame[int(self.y1.value):int(self.y2.value), int(self.x1.value):int(self.x2.value)]
+        return ProcessingResult(args=(roi_frame,))
 
 
 class CVLaneDetectionProcessingUnit(ProcessingUnit):
