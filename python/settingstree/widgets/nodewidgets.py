@@ -35,3 +35,14 @@ class Input(NodeHTMLWidget):
 
     def get_html_source(self) -> str:
         return self._render_open_tag()
+
+
+class H2NodeName(NodeHTMLWidget):
+    TAG_NAME = 'h2'
+
+    def get_html_source(self) -> str:
+        html_code = self._render_open_tag()
+        html_code += self.settings_node.verbose_name if self.settings_node.verbose_name else self.settings_node.key
+        html_code += self._render_close_tag()
+
+        return html_code
