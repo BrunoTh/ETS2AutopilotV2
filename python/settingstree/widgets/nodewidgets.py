@@ -13,8 +13,7 @@ class NodeHTMLWidget(HTMLWidget):
 
     def get_html_id(self) -> str:
         """
-        This method returns the id of settings_node for html objects.
-        :param settings_node: SettingsNode
+        This method returns the id of self.settings_node for html objects.
         """
         return self.settings_node.fqid
 
@@ -39,17 +38,26 @@ class NodeInput(NodeHTMLWidget):
 
 
 class NodeH2(NodeHTMLWidget):
+    """
+    Renders the settings node label as H2.
+    Example: <h2>settings_node.label</h2>
+    """
     def get_html_source(self) -> str:
         return H2(Text(self.settings_node.label)).get_html_source()
 
 
 class NodeSubtree(NodeHTMLWidget):
+    """
+    Renders a div containing a NodeH2 and rendered children. The div as the class 'row' attached.
+    """
     def get_html_source(self) -> str:
         if not self.settings_node.has_children():
             return ''
 
         if not self._is_in_attr('class'):
             self.attrs['class'] = 'row'
+        elif 'row' not in self.attrs['class']:
+            self.attrs['class'] += ' row'
 
         child_widgets = []
         for child in self.settings_node.children:

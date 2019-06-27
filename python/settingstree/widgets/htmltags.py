@@ -10,6 +10,9 @@ class HTMLTag(HTMLWidget):
         self.widgets = list(widgets)
 
     def get_html_source(self) -> str:
+        """
+        Returns rendered widgets between html-tags.
+        """
         html_code = self._render_open_tag()
 
         for widget in self.widgets:
@@ -64,6 +67,11 @@ class Option(HTMLTag):
     TAG_NAME = 'option'
 
     def __init__(self, *widgets, attrs={}, label=None, value=None):
+        """
+        Renders <option value="value">label</option>
+        :param label: is added as Text-Widget to self.widgets
+        :param value: is added to attrs: {'value': value}
+        """
         super().__init__(*widgets, attrs=attrs)
 
         if label:
