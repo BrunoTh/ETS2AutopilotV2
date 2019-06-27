@@ -1,2 +1,2 @@
 from .settings import Settings, SettingsNode
-from .widgets import TextWidget
+from .widgets.nodewidgets import NodeInput

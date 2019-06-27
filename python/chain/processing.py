@@ -1,7 +1,7 @@
 from logging import Logger
 from abc import ABC, abstractmethod
 from .builtin import ChainElement, ProcessingResult
-from settingstree import SettingsNode, TextWidget
+from settingstree import SettingsNode, NodeInput
 import numpy as np
 import cv2
 
@@ -40,10 +40,10 @@ class ROIPreProcessingUnit(PreProcessingUnit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.x1 = SettingsNode(key='x1', widget=TextWidget, verbose_name='Left')
-        self.x2 = SettingsNode(key='x2', widget=TextWidget, verbose_name='Right')
-        self.y1 = SettingsNode(key='y1', widget=TextWidget, verbose_name='Top')
-        self.y2 = SettingsNode(key='y2', widget=TextWidget, verbose_name='Bottom')
+        self.x1 = SettingsNode(key='x1', widget=NodeInput, verbose_name='Left')
+        self.x2 = SettingsNode(key='x2', widget=NodeInput, verbose_name='Right')
+        self.y1 = SettingsNode(key='y1', widget=NodeInput, verbose_name='Top')
+        self.y2 = SettingsNode(key='y2', widget=NodeInput, verbose_name='Bottom')
 
     def process(self, frame, *args, **kwargs):
         roi_frame = frame[int(self.y1.value):int(self.y2.value), int(self.x1.value):int(self.x2.value)]

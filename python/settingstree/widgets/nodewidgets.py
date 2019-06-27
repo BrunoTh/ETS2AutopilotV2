@@ -1,4 +1,5 @@
-from . import HTMLWidget
+from . import HTMLWidget, Text
+from .htmltags import Div, H2, Input, Label, BR
 
 
 class NodeHTMLWidget(HTMLWidget):
@@ -21,28 +22,40 @@ class NodeHTMLWidget(HTMLWidget):
         pass
 
 
-class Input(NodeHTMLWidget):
+class NodeInput(NodeHTMLWidget):
     """
-    Renders an input tag with set attributes. Default type is text.
+    Renders an input field with label surrounded by a div. Materialize CSS style.
     """
-    TAG_NAME = 'input'
-
-    def __init__(self, settings_node, attrs={}):
-        if 'type' not in attrs.keys():
-            attrs['type'] = 'text'
-
-        super().__init__(settings_node, attrs=attrs)
-
     def get_html_source(self) -> str:
-        return self._render_open_tag()
+        self.attrs['id'] = self.get_html_id()
+
+        if 'value' not in self.attrs:
+            self.attrs['value'] = self.settings_node.value
+
+        return Div(
+            Input(attrs=self.attrs),
+            Label(Text(self.settings_node.label), attrs={'for': self.attrs['id']}),
+            attrs={'class': 'input-field col'}).get_html_source()
 
 
-class H2NodeName(NodeHTMLWidget):
-    TAG_NAME = 'h2'
-
+class NodeH2(NodeHTMLWidget):
     def get_html_source(self) -> str:
-        html_code = self._render_open_tag()
-        html_code += self.settings_node.verbose_name if self.settings_node.verbose_name else self.settings_node.key
-        html_code += self._render_close_tag()
+        return H2(Text(self.settings_node.label)).get_html_source()
 
-        return html_code
+
+class NodeSubtree(NodeHTMLWidget):
+    def get_html_source(self) -> str:
+        if not self.settings_node.has_children():
+            return ''
+
+        if not self._is_in_attr('class'):
+            self.attrs['class'] = 'row'
+
+        child_widgets = []
+        for child in self.settings_node.children:
+            try:
+                child_widgets.append(Text(child.render_element()))
+            except ValueError:
+                pass
+
+        return Div(NodeH2(self.settings_node), *child_widgets, attrs=self.attrs).get_html_source()

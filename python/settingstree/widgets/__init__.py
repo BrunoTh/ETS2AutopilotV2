@@ -35,6 +35,9 @@ class HTMLWidget(ABC):
 
         return f'</{tag_name}>'
 
+    def _is_in_attr(self, key):
+        return key in self.attrs.keys()
+
     @abstractmethod
     def get_html_source(self) -> str:
         """

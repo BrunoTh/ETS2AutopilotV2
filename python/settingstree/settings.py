@@ -1,7 +1,7 @@
 from logging import Logger
 import json
 import pathlib
-from .widgets import SubtreeWidget
+from .widgets.nodewidgets import NodeSubtree
 
 
 log = Logger(__name__)
@@ -19,7 +19,7 @@ class SettingsNode:
         self.possible_choices = []
         self.is_root = False
         self.is_choice = is_choice
-        self.widget = widget
+        self.widget = widget(self) if widget else None
         self.verbose_name = verbose_name
 
         self.key = key
@@ -162,7 +162,7 @@ class SettingsNode:
         if not self.widget:
             raise ValueError('A widget is required to render this element.')
 
-        return self.widget().get_html_source(self)
+        return self.widget.get_html_source()
 
 
 # TODO: singleton?
@@ -170,7 +170,7 @@ class Settings:
     def __init__(self, filename=DEFAULT_NAME):
         self.filename = filename
         self._file_object = None
-        self.root = SettingsNode(widget=SubtreeWidget, verbose_name='Settings')
+        self.root = SettingsNode(widget=NodeSubtree, verbose_name='Settings')
 
     def get_file_object(self):
         if not self._file_object:

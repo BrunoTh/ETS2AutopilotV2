@@ -1,8 +1,6 @@
 from logging import Logger
 from abc import ABC, abstractmethod
 from .builtin import ChainElement, ProcessingResult
-from PIL import ImageGrab as ImageGrabWindows
-import pyscreenshot as ImageGrabLinux
 import numpy as np
 
 log = Logger(__name__)
@@ -22,6 +20,9 @@ class ImageGrabDevice(CapturingDevice):
     Usable on Windows.
     """
 
+    def import_dependencies(self):
+        from PIL import ImageGrab as ImageGrabWindows
+
     def process(self, *args, **kwargs):
         # TODO: bbox (Via settings?)
         frame_screen = ImageGrabWindows.grab()
@@ -34,6 +35,9 @@ class PyscreenshotDevice(CapturingDevice):
     Pyscreenshot CapturingDevice.
     Usable on Linux.
     """
+    def import_dependencies(self):
+        import pyscreenshot as ImageGrabLinux
+
     def process(self, *args, **kwargs):
         # TODO: bbox (Via settings?)
         frame_screen = ImageGrabLinux.grab()

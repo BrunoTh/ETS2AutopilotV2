@@ -1,7 +1,7 @@
 from logging import Logger
 from abc import ABC, abstractmethod
 from .builtin import ChainElement, ProcessingResult
-from settingstree import SettingsNode, TextWidget
+from settingstree import SettingsNode, NodeInput
 
 log = Logger(__name__)
 
@@ -22,7 +22,7 @@ class VjoyController(ControllerInstance):
     def __init__(self):
         super().__init__()
 
-        self.vjoy_device = SettingsNode(key='vjoy_device', value='0', widget=TextWidget, verbose_name='vJoy Device ID')
+        self.vjoy_device = SettingsNode(key='vjoy_device', value='0', widget=NodeInput, verbose_name='vJoy Device ID')
 
     def process(self, angle, *args, **kwargs):
         # Write angle to vjoy.

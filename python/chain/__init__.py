@@ -1,7 +1,7 @@
 import platform
 from abc import ABC, abstractmethod
 from settingstree import Settings, SettingsNode
-from settingstree.widgets import SubtreeWidget
+from settingstree.widgets.nodewidgets import NodeSubtree
 from . import capturing, processing, controller
 from .builtin import ChainElement, ProcessingResult
 
