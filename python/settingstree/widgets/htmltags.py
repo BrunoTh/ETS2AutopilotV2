@@ -70,7 +70,9 @@ class Option(HTMLTag):
         """
         Renders <option value="value">label</option>
         :param label: is added as Text-Widget to self.widgets
+        :type label: str
         :param value: is added to attrs: {'value': value}
+        :type value: str
         """
         super().__init__(*widgets, attrs=attrs)
 
