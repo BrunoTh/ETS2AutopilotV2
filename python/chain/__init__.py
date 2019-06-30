@@ -53,6 +53,10 @@ class ProcessingChain(ABC):
         for element in self.chain_elements:
             mid_result = element.process(*mid_result.args, **mid_result.kwargs)
 
+        # TODO: add field content_for_websocket to ProcessingResult. This than gets returned to the api which sends it
+        #  to the browser via websocket.
+        # TODO: find a way to send data via websocket from inside a chain_element.
+
 
 class CVChainWindows(ProcessingChain):
     platform = 'Windows'

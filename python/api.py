@@ -63,7 +63,7 @@ async def index_route(ws):
         # TODO: figure out better way. Maybe use an interface where you can register the commands.
         if cmd == 'activate':
             ap_active = True
-            # TODO: Does this actually work?
+            # TODO: Does this actually work? --> No! You start an infinite loop because ap_active gets never set false.
             await run_autopilot_loop()
         elif cmd == 'deactivate':
             ap_active = False

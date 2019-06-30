@@ -1,1 +1,23 @@
 {% extends '_base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="offset-sm-8 col-sm-4">
+            <img id="autopilot_image" />
+        </div>
+    </div>
+{% endblock %}
+
+
+<script>
+    var connection = new WebSocket('ws://' + window.location.host + '/ws/index');
+
+    connection.onmessage = function(e) {
+        console.log('Received: ' + e.data);
+
+        var received_json = JSON.parse(e.data);
+
+        // TODO: write received autopilot image data to #autopilot_image.
+        // TODO: test if receiving images through websockets is possible. Maybe we have to use an RTSP stream.
+    };
+</script>
