@@ -3,31 +3,58 @@ from settingstree import Settings
 import responder
 from chain import ProcessingChain
 from json.decoder import JSONDecodeError
+from threading import Thread, Lock
+import sys
 
 log = Logger(__name__)
 settings = Settings()
 responder_api = responder.API()
-processing_chain = None
-
-# APP STATES
-ap_active = False
+processing_thread = None
 
 
-class WebSocketMixin:
-    ws = None
+# TODO: move this somewhere else
+class ProcessingThread(Thread):
+    # TODO: move these to instance namespace?
+    lock = Lock()
+    ap_active = False
 
-    def send_via_websocket(self, msg):
-        pass
+    def __init__(self, processing_chain: ProcessingChain):
+        super().__init__(daemon=True)
+
+        self.processing_chain = processing_chain
+
+    def start(self) -> None:
+        with ProcessingThread.lock:
+            ProcessingThread.ap_active = True
+
+        super().start()
+
+    def stop(self):
+        with ProcessingThread.lock:
+            ProcessingThread.ap_active = False
+
+    def run(self) -> None:
+        while ProcessingThread.ap_active:
+            self.processing_chain.run()
+            # TODO: collect results of chain elements and send them (as one json) via websocket
+
+
+@responder_api.route(before_request=True, websocket=True)
+def prepare_response(ws):
+    await ws.accept()
 
 
 @responder_api.on_event('startup')
 async def initialize_chain():
-    global processing_chain
-    platform_chain = ProcessingChain.get_platform_specific_chain()
-    processing_chain = platform_chain(settings)
+    PlatformProcessingChain = ProcessingChain.get_platform_specific_chain()
+    processing_chain = PlatformProcessingChain(settings)
 
     if not processing_chain:
         log.error('Your platform is currently not supported.')
+        sys.exit(1)
+
+    global processing_thread
+    processing_thread = ProcessingThread(processing_chain)
 
 
 @responder_api.route('/')
@@ -49,24 +76,15 @@ async def index_route(ws):
     :return:
     """
 
-    @responder_api.background.task
-    async def run_autopilot_loop():
-        while ap_active:
-            processing_chain.run()
-
-    await ws.accept()
-
     while True:
         received_json = await ws.receive_json()
         cmd = received_json['cmd']
 
         # TODO: figure out better way. Maybe use an interface where you can register the commands.
         if cmd == 'activate':
-            ap_active = True
-            # TODO: Does this actually work? --> No! You start an infinite loop because ap_active gets never set false.
-            await run_autopilot_loop()
+            processing_thread.start()
         elif cmd == 'deactivate':
-            ap_active = False
+            processing_thread.stop()
 
 
 @responder_api.route('/ws/ap_image', websocket=True)
@@ -81,8 +99,6 @@ async def settings_route(ws):
     Sends json with status, fqid, value.
     :param ws: websocket
     """
-
-    await ws.accept()
 
     while True:
         # Try to receive json and catch exception if data is not valid json.
