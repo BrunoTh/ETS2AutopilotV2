@@ -5,7 +5,7 @@ class HTMLTag(HTMLWidget):
     """
     A WidgetHTMLWidget takes several widgets as inputs and renders between an open and close tag.
     """
-    def __init__(self, *widgets: HTMLWidget, attrs={}):
+    def __init__(self, *widgets: HTMLWidget, attrs=None):
         super().__init__(attrs=attrs)
         self.widgets = list(widgets)
 
@@ -49,7 +49,7 @@ class Label(HTMLTag):
 class Input(HTMLTag):
     TAG_NAME = 'input'
 
-    def __init__(self, *widgets, attrs={}):
+    def __init__(self, *widgets, attrs=None):
         super().__init__(*widgets, attrs=attrs)
 
         if 'type' not in self.attrs.keys():
@@ -57,7 +57,7 @@ class Input(HTMLTag):
 
 
 class Select(Input):
-    def __init__(self, *widgets, attrs={}):
+    def __init__(self, *widgets, attrs=None):
         super().__init__(*widgets, attrs=attrs)
 
         self.attrs['type'] = 'select'
@@ -66,7 +66,7 @@ class Select(Input):
 class Option(HTMLTag):
     TAG_NAME = 'option'
 
-    def __init__(self, *widgets, attrs={}, label=None, value=None):
+    def __init__(self, *widgets, attrs=None, label=None, value=None):
         """
         Renders <option value="value">label</option>
         :param label: is added as Text-Widget to self.widgets

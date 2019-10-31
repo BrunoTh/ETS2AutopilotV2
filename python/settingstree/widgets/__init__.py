@@ -4,12 +4,12 @@ from abc import ABC, abstractmethod
 class HTMLWidget(ABC):
     TAG_NAME = None
 
-    def __init__(self, attrs={}):
+    def __init__(self, attrs=None):
         """
         :type attrs: dict
         :param attrs: HTML-Tag attributes like class="" or style="".
         """
-        self.attrs = attrs
+        self.attrs = attrs or dict()
 
     def _render_open_tag(self, tag_name=None):
         """

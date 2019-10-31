@@ -3,8 +3,11 @@ from .htmltags import Div, H2, Input, Label, BR
 
 
 class NodeHTMLWidget(HTMLWidget):
-    def __init__(self, settings_node, attrs={}):
+    def __init__(self, settings_node, attrs=None):
         self.settings_node = settings_node
+
+        if not attrs:
+            attrs = dict()
 
         # Set the tag id
         attrs.update({'id': self.get_html_id()})
@@ -48,7 +51,7 @@ class NodeH2(NodeHTMLWidget):
 
 class NodeSubtree(NodeHTMLWidget):
     """
-    Renders a div containing a NodeH2 and rendered children. The div as the class 'row' attached.
+    Renders a div containing a NodeH2 and rendered children. The div has the css class 'row' attached.
     """
     def get_html_source(self) -> str:
         if not self.settings_node.has_children():
@@ -62,6 +65,8 @@ class NodeSubtree(NodeHTMLWidget):
         child_widgets = []
         for child in self.settings_node.children:
             try:
+                # Render the child and put the result (the html code) into a simple Text-Widget.
+                # The Text-Widget acts as wrapper.
                 child_widgets.append(Text(child.render_element()))
             except ValueError:
                 pass
