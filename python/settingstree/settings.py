@@ -174,7 +174,11 @@ class Settings:
 
     def get_file_object(self):
         if not self._file_object:
-            self._file_object = open(self.filename, 'rw')
+            filepath = pathlib.Path() / self.filename
+            if not filepath.exists():
+                filepath.touch()
+
+            self._file_object = open(filepath, 'r+')
 
         self._file_object.seek(0)
 
@@ -195,6 +199,7 @@ class Settings:
         f = self.get_file_object()
         tree_dict_flat = self.dumps()
         json.dump(tree_dict_flat, f)
+        f.flush()
 
     def load(self):
         f = self.get_file_object()

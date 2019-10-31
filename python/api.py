@@ -53,6 +53,9 @@ async def initialize_chain():
         log.error('Your platform is currently not supported.')
         sys.exit(1)
 
+    # Load settings after chain initialized tree.
+    settings.load()
+
     global processing_thread
     processing_thread = ProcessingThread(processing_chain)
 
@@ -127,6 +130,8 @@ async def settings_route(ws):
                 settings.root.set_value_of_child(fqid, value)
                 response['status'] = 200
                 response['value'] = settings.root.get_value_of_child(fqid)
+
+                settings.dump()
         except Exception as e:
             log.exception('Error in settings websocket.')
             response['status'] = 500
