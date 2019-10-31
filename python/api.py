@@ -40,7 +40,7 @@ class ProcessingThread(Thread):
 
 
 @responder_api.route(before_request=True, websocket=True)
-def prepare_response(ws):
+async def prepare_response(ws):
     await ws.accept()
 
 
