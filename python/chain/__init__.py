@@ -40,6 +40,7 @@ class ProcessingChain(ABC):
 
         # Collect element specific settings from chain_element.
         chain_element_settings_subtree = chain_element.collect_settings()
+        # But only add this collected subtree if it has children on it. This prevents useless empty nodes.
         if chain_element_settings_subtree.has_children():
             self._settings.root.add_child(chain_element_settings_subtree)
 

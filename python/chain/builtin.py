@@ -16,13 +16,14 @@ class ChainElement(ABC):
 
     def collect_settings(self) -> SettingsNode:
         """
-        This methods searches for instances of SettingsNodes and adds them to self._settings_node.
-        :return: self._settings_node
+        This methods searches for instances of SettingsNodes, adds them as children to a parent SettingsNode and
+        returns it.
+        :return: SettingsNode object with found children attached.
         """
         settings_node = SettingsNode(key=self.__class__.__name__, verbose_name=self.__class__.VERBOSE_NAME,
                                      widget=NodeSubtree)
         for attribute in dir(self):
-            if attribute != '_settings_node' and isinstance(getattr(self, attribute), SettingsNode):
+            if isinstance(getattr(self, attribute), SettingsNode):
                 settings_node.add_child(getattr(self, attribute))
 
         return settings_node
