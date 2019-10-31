@@ -17,7 +17,7 @@
 
             if (received_json.status == 200) {
                 // TODO: element id comes from Widget.get_html_id. May pass prefix via template.
-                var input_field = document.getElementById('id_' + received_json.fqid);
+                var input_field = document.getElementById(received_json.fqid);
                 input_field.value = received_json.value;
             }
         };
@@ -43,13 +43,14 @@
             hideSaveCancelButtons(parent);
 
             let surrounding_div = document.createElement('div');
-            surrounding_div.classList.add('prefix');
+            surrounding_div.setAttribute('name', 'edit_actions');
 
             // Generate cancel link
             let cancel_link = document.createElement('i');
             cancel_link.classList.add('material-icons');
             cancel_link.appendChild(document.createTextNode('cancel'));
             cancel_link.setAttribute('name', 'cancel');
+            cancel_link.style.cursor = 'context-menu';
             cancel_link.addEventListener('click', function(event) {
                 cancelOnClick(parent);
             });
@@ -60,6 +61,7 @@
             save_link.classList.add('material-icons');
             save_link.appendChild(document.createTextNode('check'));
             save_link.setAttribute('name', 'save');
+            save_link.style.cursor = 'context-menu';
             save_link.addEventListener('click', function(event) {
                 saveOnClick(parent);
             });
@@ -69,21 +71,20 @@
         }
 
         function hideSaveCancelButtons(parent) {
-            // Remove all links (a tags) from parent.
-            let link_elements = parent.getElementsByTagName('i');
+            var edit_actions_div = parent.querySelector('[name="edit_actions"]');
 
-            for (let i=link_elements.length-1; i>=0; i--) {
-                parent.removeChild(link_elements[i]);
+            if (edit_actions_div !== null) {
+                edit_actions_div.remove();
             }
         }
 
         function saveOnClick(parent) {
             // Get the input element.
-            let element = parent.getElementsByTagName('input')[0];
+            let input_element = parent.getElementsByTagName('input')[0];
 
             // Read fqid and value.
-            let fqid = element.getAttribute('id').replace('id_', '');
-            let value = element.value;
+            let fqid = input_element.getAttribute('id').replace('id_', '');
+            let value = input_element.value;
 
             // Send fqid and value via websocket and remove buttons.
             setValueWithFqid(fqid, value);
