@@ -197,10 +197,15 @@ class Settings:
 
     def dump(self):
         f = self.get_file_object()
+        current_settings = json.load(f)
+
         # Delete file content.
         f.truncate(0)
         tree_dict_flat = self.dumps()
-        json.dump(tree_dict_flat, f)
+
+        # Update the settings, leave old (currently unused values) untouched.
+        current_settings.update(tree_dict_flat)
+        json.dump(current_settings, f)
         f.flush()
 
     def load(self):
