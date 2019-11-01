@@ -46,7 +46,11 @@ class WSConnectionPool:
         self._cleanup_closed_connections()
 
         for ws_conn in self._connection_pool[path]:
-            await ws_conn.send_text(*args, **kwargs)
+            try:
+                await ws_conn.send_text(*args, **kwargs)
+            except RuntimeError:
+                # Gets raised when trying to send to an already closed connection.
+                log.exception('')
 
     async def send_bytes(self, path_or_websocket, *args, **kwargs):
         if isinstance(path_or_websocket, WebSocket):
@@ -57,7 +61,11 @@ class WSConnectionPool:
         self._cleanup_closed_connections()
 
         for ws_conn in self._connection_pool[path]:
-            await ws_conn.send_bytes(*args, **kwargs)
+            try:
+                await ws_conn.send_bytes(*args, **kwargs)
+            except RuntimeError:
+                # Gets raised when trying to send to an already closed connection.
+                log.exception('')
 
     async def send_json(self, path_or_websocket, *args, **kwargs):
         if isinstance(path_or_websocket, WebSocket):
@@ -68,7 +76,11 @@ class WSConnectionPool:
         self._cleanup_closed_connections()
 
         for ws_conn in self._connection_pool[path]:
-            await ws_conn.send_json(*args, **kwargs)
+            try:
+                await ws_conn.send_json(*args, **kwargs)
+            except RuntimeError:
+                # Gets raised when trying to send to an already closed connection.
+                log.exception('')
 
 
 # TODO: move this somewhere else
