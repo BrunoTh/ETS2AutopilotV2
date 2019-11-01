@@ -50,8 +50,14 @@ class ROIPreProcessingUnit(PreProcessingUnit):
         return ProcessingResult(args=(roi_frame,))
 
 
+class GrayscaleConversionPreProcessingUnit(PreProcessingUnit):
+    def process(self, frame, *args, **kwargs):
+        grayscale_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        return ProcessingResult(args=(grayscale_frame,))
+
+
 class CVLaneDetectionProcessingUnit(ProcessingUnit):
     def process(self, frame, *args, **kwargs):
         angle = 0
         # TODO: Also send image with drawn lanes to webapp.
-        return ProcessingResult()
+        return ProcessingResult(kwargs={'angle': angle})

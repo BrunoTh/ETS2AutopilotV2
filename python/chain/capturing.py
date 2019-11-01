@@ -21,6 +21,7 @@ class ImageGrabDevice(CapturingDevice):
     """
 
     def import_dependencies(self):
+        # TODO: make this work... please.
         from PIL import ImageGrab as ImageGrabWindows
 
     def process(self, *args, **kwargs):

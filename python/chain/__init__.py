@@ -2,8 +2,11 @@ import platform
 from abc import ABC, abstractmethod
 from settingstree import Settings, SettingsNode
 from settingstree.widgets.nodewidgets import NodeSubtree
-from . import capturing, processing, controller
-from .builtin import ChainElement, ProcessingResult
+from chain import capturing, processing, controller
+from chain.builtin import ChainElement, ProcessingResult
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class ProcessingChain(ABC):
@@ -52,7 +55,13 @@ class ProcessingChain(ABC):
         mid_result = ProcessingResult([], {})
 
         for element in self.chain_elements:
-            mid_result = element.process(*mid_result.args, **mid_result.kwargs)
+            try:
+                mid_result = element.process(*mid_result.args, **mid_result.kwargs)
+            except TypeError as e:
+                log.exception(f'Error in while processing ChainElement {element}.')
+                raise
+
+        return mid_result
 
         # TODO: add field content_for_websocket to ProcessingResult. This than gets returned to the api which sends it
         #  to the browser via websocket.
@@ -68,8 +77,9 @@ class CVChainWindows(ProcessingChain):
         self.register(capturing.ImageGrabDevice())
         self.register(processing.ColorConversionPreProcessingUnit())
         self.register(processing.ROIPreProcessingUnit())
-        self.register(processing.CVLaneDetectionProcessingUnit())
-        self.register(controller.VjoyController())
+        self.register(processing.GrayscaleConversionPreProcessingUnit())
+        # self.register(processing.CVLaneDetectionProcessingUnit())
+        # self.register(controller.VjoyController())
 
 
 class CVChainLinux(ProcessingChain):
@@ -81,5 +91,6 @@ class CVChainLinux(ProcessingChain):
         self.register(capturing.PyscreenshotDevice())
         self.register(processing.ColorConversionPreProcessingUnit())
         self.register(processing.ROIPreProcessingUnit())
+        self.register(processing.GrayscaleConvertionPreProcessingUnit())
         self.register(processing.CVLaneDetectionProcessingUnit())
         # self.register()
