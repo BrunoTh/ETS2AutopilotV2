@@ -197,10 +197,15 @@ class Settings:
 
     def dump(self):
         f = self.get_file_object()
-        current_settings = json.load(f)
+        try:
+            current_settings = json.load(f) or dict()
+        except json.decoder.JSONDecodeError:
+            log.exception('Invalid json file.')
+            current_settings = dict()
 
         # Delete file content.
         f.truncate(0)
+        f.seek(0)
         tree_dict_flat = self.dumps()
 
         # Update the settings, leave old (currently unused values) untouched.
