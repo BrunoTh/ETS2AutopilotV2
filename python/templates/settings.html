@@ -19,6 +19,14 @@
                 // TODO: element id comes from Widget.get_html_id. May pass prefix via template.
                 var input_field = document.getElementById(received_json.fqid);
                 input_field.value = received_json.value;
+
+                // Add or remove css class for label.
+                var label_field = document.querySelector(`label[for="${received_json.fqid}"]`);
+                if (input_field.value === "" && label_field.classList.contains('active')) {
+                    label_field.classList.remove('active');
+                } else if (input_field.value !== "" && !label_field.classList.contains('active')) {
+                    label_field.classList.add('active');
+                }
             }
         };
 
