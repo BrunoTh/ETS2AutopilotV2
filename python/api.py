@@ -1,15 +1,74 @@
 from logging import Logger
 from settingstree import Settings
 import responder
+from starlette.websockets import WebSocketDisconnect, WebSocket, WebSocketState
 from chain import ProcessingChain
 from json.decoder import JSONDecodeError
 from threading import Thread, Lock
+from collections import defaultdict
 import sys
 
 log = Logger(__name__)
 settings = Settings()
 responder_api = responder.API()
 processing_thread = None
+
+
+# TODO: move this somewhere else
+class WSConnectionPool:
+    def __init__(self):
+        self._connection_pool = defaultdict(list)
+
+    def _cleanup_closed_connections(self):
+        for path in self._connection_pool:
+            for ws_conn in self._connection_pool[path]:
+                if ws_conn.client_state == WebSocketState.DISCONNECTED or \
+                        ws_conn.application_state == WebSocketState.DISCONNECTED:
+                    # TODO: maybe we need to close the connection to the client sometimes.
+                    self.remove_connection(ws_conn)
+
+    def add_connection(self, ws: WebSocket):
+        if not isinstance(ws, WebSocket):
+            raise TypeError('ws needs to be an instance of starlette.websockets.Websocket.')
+
+        if ws not in self._connection_pool[ws.url.path]:
+            self._connection_pool[ws.url.path].append(ws)
+
+    def remove_connection(self, ws: WebSocket):
+        self._connection_pool[ws.url.path].remove(ws)
+
+    async def send_text(self, path_or_websocket, *args, **kwargs):
+        if isinstance(path_or_websocket, WebSocket):
+            path = path_or_websocket.url.path
+        else:
+            path = path_or_websocket
+
+        self._cleanup_closed_connections()
+
+        for ws_conn in self._connection_pool[path]:
+            await ws_conn.send_text(*args, **kwargs)
+
+    async def send_bytes(self, path_or_websocket, *args, **kwargs):
+        if isinstance(path_or_websocket, WebSocket):
+            path = path_or_websocket.url.path
+        else:
+            path = path_or_websocket
+
+        self._cleanup_closed_connections()
+
+        for ws_conn in self._connection_pool[path]:
+            await ws_conn.send_bytes(*args, **kwargs)
+
+    async def send_json(self, path_or_websocket, *args, **kwargs):
+        if isinstance(path_or_websocket, WebSocket):
+            path = path_or_websocket.url.path
+        else:
+            path = path_or_websocket
+
+        self._cleanup_closed_connections()
+
+        for ws_conn in self._connection_pool[path]:
+            await ws_conn.send_json(*args, **kwargs)
 
 
 # TODO: move this somewhere else
@@ -39,9 +98,14 @@ class ProcessingThread(Thread):
             # TODO: collect results of chain elements and send them (as one json) via websocket
 
 
+ws_connection_pool = WSConnectionPool()
+
+
 @responder_api.route(before_request=True, websocket=True)
 async def prepare_response(ws):
     await ws.accept()
+    # Add connection to connection pool.
+    ws_connection_pool.add_connection(ws)
 
 
 @responder_api.on_event('startup')
@@ -102,7 +166,6 @@ async def settings_route(ws):
     Sends json with status, fqid, value.
     :param ws: websocket
     """
-
     while True:
         # Try to receive json and catch exception if data is not valid json.
         try:
@@ -137,4 +200,5 @@ async def settings_route(ws):
             response['status'] = 500
             response['value'] = str(e)
 
-        await ws.send_json(response)
+        # Send changes to all websocket connections.
+        await ws_connection_pool.send_json(ws, response)
