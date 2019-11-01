@@ -19,7 +19,7 @@ class SettingsNode:
         self.possible_choices = []
         self.is_root = False
         self.is_choice = is_choice
-        self.widget = widget(self) if widget else None
+        self.widget = widget
         self.verbose_name = verbose_name
 
         self.key = key
@@ -162,7 +162,7 @@ class SettingsNode:
         if not self.widget:
             raise ValueError('A widget is required to render this element.')
 
-        return self.widget.get_html_source()
+        return self.widget(self).get_html_source()
 
 
 # TODO: singleton?
