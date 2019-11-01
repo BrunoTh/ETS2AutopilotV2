@@ -197,6 +197,8 @@ class Settings:
 
     def dump(self):
         f = self.get_file_object()
+        # Delete file content.
+        f.truncate(0)
         tree_dict_flat = self.dumps()
         json.dump(tree_dict_flat, f)
         f.flush()
