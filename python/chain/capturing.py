@@ -21,26 +21,19 @@ class ImageGrabDevice(CapturingDevice):
     """
 
     def import_dependencies(self):
-        # TODO: make this work... please.
-        from PIL import ImageGrab as ImageGrabWindows
+        self._import_helper('PIL.ImageGrab', 'ImageGrab')
 
     def process(self, *args, **kwargs):
         # TODO: bbox (Via settings?)
-        frame_screen = ImageGrabWindows.grab()
+        frame_screen = self._imported_dependencies['ImageGrab'].grab()
         frame_screen_converted = np.uint8(frame_screen)
         return ProcessingResult(args=(frame_screen_converted,))
 
 
-class PyscreenshotDevice(CapturingDevice):
+class PyscreenshotDevice(ImageGrabDevice):
     """
-    Pyscreenshot CapturingDevice.
+    Pyscreenshot CapturingDevice. Imports pyscreenshot as ImageGrab instead of PIL.ImageGrab.
     Usable on Linux.
     """
     def import_dependencies(self):
-        import pyscreenshot as ImageGrabLinux
-
-    def process(self, *args, **kwargs):
-        # TODO: bbox (Via settings?)
-        frame_screen = ImageGrabLinux.grab()
-        frame_screen_converted = np.uint8(frame_screen)
-        return ProcessingResult(args=(frame_screen_converted,))
+        self._import_helper('pyscreenshot', 'ImageGrab')
