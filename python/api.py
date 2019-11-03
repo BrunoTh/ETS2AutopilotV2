@@ -61,10 +61,12 @@ class ProcessingThread(Thread):
     def run(self) -> None:
         try:
             while ProcessingThread.ap_active:
-                self.processing_chain.run()
+                result = self.processing_chain.run()
                 # Test: Send message to clients from inside the thread. (Is this even legal?)
-                asyncio.run(ws_connection_pool.send_text('/ws/index', 'test'))
-                # TODO: collect results of chain elements and send them (as one json) via websocket
+
+                for element in result:
+                    # TODO: find format for element
+                    asyncio.run(ws_connection_pool.send_json('/ws/index', element))
         finally:
             self.stopped = True
             # TODO: set ap_active to False?

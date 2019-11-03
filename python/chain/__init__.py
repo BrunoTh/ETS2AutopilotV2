@@ -47,21 +47,24 @@ class ProcessingChain(ABC):
         if chain_element_settings_subtree.has_children():
             self._settings.root.add_child(chain_element_settings_subtree)
 
-    def run(self):
+    def run(self) -> list:
         """
         This method iterates through all registered chain_elements. It calls the process method and passes the output
         to the next chain element.
+        :return: list with data from chain members.
         """
         mid_result = ProcessingResult([], {})
+        end_result = []
 
         for element in self.chain_elements:
             try:
                 mid_result = element.process(*mid_result.args, **mid_result.kwargs)
+                if mid_result.data_to_send:
+                    end_result.append(mid_result.data_to_send)
             except TypeError as e:
                 log.exception(f'Error in while processing ChainElement {element}.')
-                raise
 
-        return mid_result
+        return end_result
 
         # TODO: add field content_for_websocket to ProcessingResult. This than gets returned to the api which sends it
         #  to the browser via websocket.

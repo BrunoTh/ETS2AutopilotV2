@@ -4,7 +4,7 @@ from settingstree.widgets.nodewidgets import NodeSubtree
 from collections import namedtuple
 from importlib import import_module
 
-ProcessingResult = namedtuple('ProcessingResult', ('args', 'kwargs'), defaults=([], {}))
+ProcessingResult = namedtuple('ProcessingResult', ('args', 'kwargs', 'data_to_send'), defaults=([], {}, {}))
 
 
 class ChainElement(ABC):
