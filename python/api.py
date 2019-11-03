@@ -7,11 +7,67 @@ from json.decoder import JSONDecodeError
 from threading import Thread, Lock
 from collections import defaultdict
 import sys
+import asyncio
 
 log = Logger(__name__)
 settings = Settings()
 responder_api = responder.API()
-processing_thread = None
+
+PlatformProcessingChain = ProcessingChain.get_platform_specific_chain()
+processing_chain = PlatformProcessingChain(settings)
+
+if not processing_chain:
+    log.error('Your platform is currently not supported.')
+    sys.exit(1)
+
+# Load settings after chain initialized tree.
+settings.load()
+
+
+# TODO: move this somewhere else
+class ProcessingThread(Thread):
+    # TODO: move these to instance namespace?
+    lock = Lock()
+    ap_active = False
+    instance = None
+
+    def __init__(self, processing_chain: ProcessingChain):
+        super().__init__(daemon=True)
+
+        self.processing_chain = processing_chain
+        self.stopped = False
+
+    @classmethod
+    def get_instance(cls, processing_chain: ProcessingChain):
+        if not cls.instance or cls.instance.stopped:
+            cls.instance = cls(processing_chain)
+
+        return cls.instance
+
+    def start(self) -> None:
+        # Thread is already running.
+        if self.is_alive():
+            return
+
+        with ProcessingThread.lock:
+            ProcessingThread.ap_active = True
+
+        super().start()
+
+    def stop(self):
+        with ProcessingThread.lock:
+            ProcessingThread.ap_active = False
+
+    def run(self) -> None:
+        try:
+            while ProcessingThread.ap_active:
+                self.processing_chain.run()
+                # Test: Send message to clients from inside the thread. (Is this even legal?)
+                asyncio.run(ws_connection_pool.send_text('/ws/index', 'test'))
+                # TODO: collect results of chain elements and send them (as one json) via websocket
+        finally:
+            self.stopped = True
+            # TODO: set ap_active to False?
 
 
 # TODO: move this somewhere else
@@ -83,33 +139,6 @@ class WSConnectionPool:
                 log.exception('')
 
 
-# TODO: move this somewhere else
-class ProcessingThread(Thread):
-    # TODO: move these to instance namespace?
-    lock = Lock()
-    ap_active = False
-
-    def __init__(self, processing_chain: ProcessingChain):
-        super().__init__(daemon=True)
-
-        self.processing_chain = processing_chain
-
-    def start(self) -> None:
-        with ProcessingThread.lock:
-            ProcessingThread.ap_active = True
-
-        super().start()
-
-    def stop(self):
-        with ProcessingThread.lock:
-            ProcessingThread.ap_active = False
-
-    def run(self) -> None:
-        while ProcessingThread.ap_active:
-            self.processing_chain.run()
-            # TODO: collect results of chain elements and send them (as one json) via websocket
-
-
 ws_connection_pool = WSConnectionPool()
 
 
@@ -118,22 +147,6 @@ async def prepare_response(ws):
     await ws.accept()
     # Add connection to connection pool.
     ws_connection_pool.add_connection(ws)
-
-
-@responder_api.on_event('startup')
-async def initialize_chain():
-    PlatformProcessingChain = ProcessingChain.get_platform_specific_chain()
-    processing_chain = PlatformProcessingChain(settings)
-
-    if not processing_chain:
-        log.error('Your platform is currently not supported.')
-        sys.exit(1)
-
-    # Load settings after chain initialized tree.
-    settings.load()
-
-    global processing_thread
-    processing_thread = ProcessingThread(processing_chain)
 
 
 @responder_api.route('/')
@@ -154,16 +167,21 @@ async def index_route(ws):
     :param ws:
     :return:
     """
-
     while True:
         received_json = await ws.receive_json()
         cmd = received_json['cmd']
 
         # TODO: figure out better way. Maybe use an interface where you can register the commands.
         if cmd == 'activate':
-            processing_thread.start()
+            try:
+                ProcessingThread.get_instance(processing_chain).start()
+            except RuntimeError:
+                log.exception('')
         elif cmd == 'deactivate':
-            processing_thread.stop()
+            try:
+                ProcessingThread.get_instance(processing_chain).stop()
+            except RuntimeError:
+                log.exception('')
 
 
 @responder_api.route('/ws/ap_image', websocket=True)
