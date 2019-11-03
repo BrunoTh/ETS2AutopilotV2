@@ -2,22 +2,39 @@
 
 {% block content %}
     <div class="row">
+        <button onclick="activate()">Activate</button>
+        <button onclick="deactivate()">Deactivate</button>
+    </div>
+    <div class="row">
         <div class="offset-sm-8 col-sm-4">
-            <img id="autopilot_image" />
+            <img id="autopilot_image" style="width: 100%" /><br />
+            <img id="autopilot_roi" style="max-width: 100%" />
         </div>
     </div>
+
+    <script>
+        var connection = new WebSocket('ws://' + window.location.host + '/ws/index');
+
+        connection.onmessage = function(e) {
+            // console.log('Received: ' + e.data);
+
+            var received_json = JSON.parse(e.data);
+            if (received_json.hasOwnProperty('image_full'))
+                document.getElementById('autopilot_image').src = 'data:image/jpg;base64,' + received_json.image_full;
+
+            if (received_json.hasOwnProperty('image_roi'))
+                document.getElementById('autopilot_roi').src = 'data:image/jpg;base64,' + received_json.image_roi;
+
+            // TODO: write received autopilot image data to #autopilot_image.
+            // TODO: test if receiving images through websockets is possible. Maybe we have to use an RTSP stream.
+        };
+
+        function activate() {
+            connection.send('{"cmd": "activate"}');
+        }
+
+        function deactivate() {
+            connection.send('{"cmd": "deactivate"}');
+        }
+    </script>
 {% endblock %}
-
-
-<script>
-    var connection = new WebSocket('ws://' + window.location.host + '/ws/index');
-
-    connection.onmessage = function(e) {
-        console.log('Received: ' + e.data);
-
-        var received_json = JSON.parse(e.data);
-
-        // TODO: write received autopilot image data to #autopilot_image.
-        // TODO: test if receiving images through websockets is possible. Maybe we have to use an RTSP stream.
-    };
-</script>

@@ -4,6 +4,7 @@ from .builtin import ChainElement, ProcessingResult
 from settingstree import SettingsNode, NodeInput
 import numpy as np
 import cv2
+from chain.tools import encode_frame_to_base64
 
 log = Logger(__name__)
 
@@ -31,7 +32,8 @@ class ProcessingUnit(ChainElement):
 class ColorConversionPreProcessingUnit(PreProcessingUnit):
     def process(self, frame, *args, **kwargs):
         frame_converted = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return ProcessingResult(args=(frame_converted,))
+        return ProcessingResult(args=(frame_converted,),
+                                data_to_send={'image_full': encode_frame_to_base64(frame_converted)})
 
 
 class ROIPreProcessingUnit(PreProcessingUnit):
@@ -47,7 +49,7 @@ class ROIPreProcessingUnit(PreProcessingUnit):
 
     def process(self, frame, *args, **kwargs):
         roi_frame = frame[int(self.y1.value):int(self.y2.value), int(self.x1.value):int(self.x2.value)]
-        return ProcessingResult(args=(roi_frame,))
+        return ProcessingResult(args=(roi_frame,), data_to_send={'image_roi': encode_frame_to_base64(roi_frame)})
 
 
 class GrayscaleConversionPreProcessingUnit(PreProcessingUnit):
