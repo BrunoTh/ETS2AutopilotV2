@@ -94,6 +94,6 @@ class CVChainLinux(ProcessingChain):
         self.register(capturing.PyscreenshotDevice())
         self.register(processing.ColorConversionPreProcessingUnit())
         self.register(processing.ROIPreProcessingUnit())
-        self.register(processing.GrayscaleConvertionPreProcessingUnit())
+        self.register(processing.GrayscaleConversionPreProcessingUnit())
         self.register(processing.CVLaneDetectionProcessingUnit())
         # self.register()
