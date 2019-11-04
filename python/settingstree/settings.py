@@ -1,5 +1,6 @@
 from logging import Logger
 import json
+from json.decoder import JSONDecodeError
 import pathlib
 from .widgets.nodewidgets import NodeSubtree
 
@@ -215,5 +216,8 @@ class Settings:
 
     def load(self):
         f = self.get_file_object()
-        json_dict = json.load(f)
-        self.root.fill_tree_flat(json_dict)
+        try:
+            json_dict = json.load(f)
+            self.root.fill_tree_flat(json_dict)
+        except JSONDecodeError:
+            pass
