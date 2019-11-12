@@ -9,14 +9,14 @@ Progress
 
 * Settings module ○
     * Core ✓
-    * Module specific settings ◍
-    * Store/Restore settings ○
+    * Module specific settings ✓
+    * Store/Restore settings ✓
 * UI
-    * Settings ○
-    * AP Dashboard
+    * Settings ◍
+    * AP Dashboard ○
 * Autopilot
     * Processing Chain (Core) ○
-    * Capturing
-    * Preprocessing
-    * Processing
+    * Capturing ✓
+    * Preprocessing ◍
+    * Processing ○
     * Control
