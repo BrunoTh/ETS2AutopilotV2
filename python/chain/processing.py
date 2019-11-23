@@ -48,6 +48,16 @@ class ROIPreProcessingUnit(PreProcessingUnit):
         self.y2 = SettingsNode(key='y2', widget=NodeInput, verbose_name='Bottom')
 
     def process(self, frame, *args, **kwargs):
+        # Set settings variables to size of frame if they are still unset.
+        if not self.x1.value:
+            self.x1.value = 0
+        if not self.y1.value:
+            self.y1.value = 0
+        if not self.x2.value:
+            self.x2.value = frame.shape[1]
+        if not self.y2.value:
+            self.y2.value = frame.shape[0]
+
         roi_frame = frame[int(self.y1.value):int(self.y2.value), int(self.x1.value):int(self.x2.value)]
         return ProcessingResult(args=(roi_frame,), data_to_send={'image_roi': encode_frame_to_base64(roi_frame)})
 
