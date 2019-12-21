@@ -30,6 +30,13 @@ class ChainElement(ABC):
 
         return settings_node
 
+    def collect_web_functions(self) -> dict:
+        """
+        This method returns a dict with all registered web functions of the chain element.
+        :return: dict with web functions.
+        """
+        return dict()
+
     def _import_helper(self, module: str, alias: str):
         """
         Uses importlib.import_module to import the given module and adds it to the dict self._imported_dependencies with

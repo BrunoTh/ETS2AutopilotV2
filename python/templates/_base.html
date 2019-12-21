@@ -25,5 +25,13 @@
         </div>
 
         <script type="text/javascript" src="/static/js/materialize.min.js"></script>
+
+        <script type="text/javascript">
+            var web_function_connection = new WebSocket('ws://' + window.location.host + '/ws/web_functions');
+
+            web_function_connection.onmessage = function(e) {
+                console.log(e.data);
+            };
+        </script>
     </body>
 </html>

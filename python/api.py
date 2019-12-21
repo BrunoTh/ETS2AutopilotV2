@@ -2,7 +2,7 @@ from logging import Logger
 from settingstree import Settings
 import responder
 from starlette.websockets import WebSocketDisconnect, WebSocket, WebSocketState
-from chain import ProcessingChain
+from chain import ProcessingChain, WebFunctionDoesNotExistException
 from json.decoder import JSONDecodeError
 from threading import Thread, Lock
 from collections import defaultdict
@@ -233,4 +233,38 @@ async def settings_route(ws):
             response['value'] = str(e)
 
         # Send changes to all websocket connections.
+        await ws_connection_pool.send_json(ws, response)
+
+
+@responder_api.route('/ws/web_functions', websocket=True)
+async def web_functions_route(ws):
+    """
+    Websocket endpoint for web functions. Call functions in settings nodes by name. They may also return something.
+    :param ws: websocket
+    """
+    while True:
+        try:
+            received_json = await ws.receive_json()
+        except JSONDecodeError:
+            log.exception('Received message is not valid json!')
+            continue
+
+        function_name = received_json['function_name']
+        function_arguments = received_json.get('function_arguments', {})
+
+        response = {'status': 500, 'function_name': function_name, 'function_arguments': function_arguments,
+                    'result': None}
+
+        try:
+            function_result = await processing_chain.call_web_function(function_name, function_arguments)
+            response['status'] = 200
+            response['result'] = function_result
+        except WebFunctionDoesNotExistException:
+            response['status'] = 500
+            response['result'] = 'The web function does not exist.'
+        except Exception as e:
+            log.exception('Error in settings websocket.')
+            response['status'] = 500
+            response['result'] = str(e)
+
         await ws_connection_pool.send_json(ws, response)

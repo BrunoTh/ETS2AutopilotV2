@@ -9,6 +9,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class WebFunctionDoesNotExistException(Exception):
+    pass
+
+
 class ProcessingChain(ABC):
     # Use this chain if platform string matches platform.system()
     platform = 'Linux'
@@ -17,6 +21,7 @@ class ProcessingChain(ABC):
         super().__init__()
         self.chain_elements = []
         self._settings = settings
+        self._web_functions = {}
 
     @classmethod
     def get_platform_specific_chain(cls):
@@ -46,6 +51,24 @@ class ProcessingChain(ABC):
         # But only add this collected subtree if it has children on it. This prevents useless empty nodes.
         if chain_element_settings_subtree.has_children():
             self._settings.root.add_child(chain_element_settings_subtree)
+
+        # Register web functions
+        # TODO: namespaces for web functions
+        self._web_functions.update(chain_element.collect_web_functions())
+        log.debug(f'Registed web functions: {[key for key in chain_element.collect_web_functions().keys()]}')
+
+    async def call_web_function(self, name, kwargs):
+        """
+        Tries to find web functions with given `name` and executes it.
+        :raises WebFunctionDoesNotExistException
+        :param name: Name of web function.
+        :param kwargs: Arguments for web function call.
+        :return: Result of web function.
+        """
+        if name not in self._web_functions:
+            raise WebFunctionDoesNotExistException
+
+        return await self._web_functions[name](kwargs)
 
     def run(self) -> list:
         """
