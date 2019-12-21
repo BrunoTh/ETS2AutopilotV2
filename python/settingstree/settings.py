@@ -14,13 +14,14 @@ DEFAULT_NAME = 'settings.json'
 class SettingsNode:
     ROOT_NODE_NAME = 'root'
 
-    def __init__(self, key='', value='', is_choice=False, widget=None, verbose_name=None):
+    def __init__(self, key='', value='', is_choice=False, widget=None, widget_args=None, verbose_name=None):
         self.fqid = SettingsNode.ROOT_NODE_NAME  # fully qualified id (e.g. root.controller.device_id)
         self.children = []
         self.possible_choices = []
         self.is_root = False
         self.is_choice = is_choice
         self.widget = widget
+        self.widget_args = widget_args
         self.verbose_name = verbose_name
 
         self.key = key
@@ -163,7 +164,7 @@ class SettingsNode:
         if not self.widget:
             raise ValueError('A widget is required to render this element.')
 
-        return self.widget(self).get_html_source()
+        return self.widget(self, attrs=self.widget_args).get_html_source()
 
 
 # TODO: singleton?
