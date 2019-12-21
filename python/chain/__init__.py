@@ -82,7 +82,7 @@ class CVChainWindows(ProcessingChain):
         self.register(processing.ROIPreProcessingUnit())
         self.register(processing.GrayscaleConversionPreProcessingUnit())
         # self.register(processing.CVLaneDetectionProcessingUnit())
-        # self.register(controller.VjoyController())
+        self.register(controller.VjoyController())
 
 
 class CVChainLinux(ProcessingChain):
