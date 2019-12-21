@@ -7,7 +7,7 @@ Progress
 --------
 ○ - WIP, ◍ - Almost done, ✓ - Done
 
-* Settings module ○
+* Settings module ◍
     * Core ✓
     * Module specific settings ✓
     * Store/Restore settings ✓
@@ -19,4 +19,4 @@ Progress
     * Capturing ✓
     * Preprocessing ◍
     * Processing ○
-    * Control
+    * Control ○
